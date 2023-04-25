@@ -9,16 +9,15 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <AnchorPane fx:id="root" prefHeight="600" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MainController">
    <children>
-      <SplitPane dividerPositions="0.2" layoutX="5.0" layoutY="31.0" prefHeight="603.6" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+      <SplitPane dividerPositions="0.2" layoutX="5.0" layoutY="31.0" prefHeight="600" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
         <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+          <AnchorPane fx:id="controlRoot" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
                   <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="37.0" prefHeight="593.0" prefWidth="150.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" textAlignment="CENTER">
+                        <Button fx:id="btnTest" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBtnTestAction" prefHeight="30.0" prefWidth="100.0" text="Test" textAlignment="CENTER">
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
@@ -35,13 +34,13 @@
                   </VBox>
                </children>
             </AnchorPane>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="593.0" prefWidth="654.0" />
+          <AnchorPane fx:id="contentRoot" minHeight="0.0" minWidth="0.0" prefHeight="593.0" prefWidth="654.0" />
         </items>
          <opaqueInsets>
             <Insets />
          </opaqueInsets>
       </SplitPane>
-      <AnchorPane layoutX="170.0" layoutY="113.0" prefHeight="26.0" prefWidth="134.0" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane fx:id="menuRoot" layoutX="170.0" layoutY="113.0" prefHeight="26.0" prefWidth="134.0" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <MenuBar prefHeight="25.6" prefWidth="133.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
               <menus>

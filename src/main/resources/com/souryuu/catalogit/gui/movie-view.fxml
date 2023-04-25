@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
+
+<AnchorPane prefHeight="570.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MovieController">
+   <children>
+      <Label layoutX="10.0" layoutY="90.0" text="Tytuł">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label layoutX="10.0" layoutY="60.0" text="IMDB Link">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label layoutX="10.0" layoutY="180.0" text="Data Wydania">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label layoutX="10.0" layoutY="120.0" text="Reżyser">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label layoutX="10.0" layoutY="210.0" text="Czas Trwania">
+         <font>
+            <Font size="18.0" />
+         </font></Label>
+      <Label layoutX="10.0" layoutY="150.0" text="Scenarzysta">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER" layoutX="340.0" layoutY="10.0" prefHeight="290.0" prefWidth="300.0" style="-fx-background-color: WHITE;" AnchorPane.bottomAnchor="270.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+         <children>
+            <ImageView fx:id="viewCoverImage" fitHeight="290.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
+         </children>
+      </HBox>
+      <Separator layoutX="330.0" orientation="VERTICAL" prefHeight="570.0" prefWidth="1.0" />
+      <Separator layoutY="50.0" prefWidth="331.0" />
+      <Label layoutX="10.0" layoutY="10.0" text="Dodaj Nowy Film">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Separator layoutX="330.0" layoutY="310.0" prefWidth="320.0" />
+      <TextField fx:id="textWriters" disable="true" layoutX="130.0" layoutY="150.0" prefWidth="190.0" />
+      <TextField fx:id="textReleaseDate" layoutX="130.0" layoutY="180.0" prefWidth="190.0" />
+      <TextField fx:id="textRuntime" layoutX="130.0" layoutY="210.0" prefWidth="190.0" />
+      <TextField fx:id="textDirectors" disable="true" layoutX="130.0" layoutY="120.0" prefWidth="190.0" />
+      <TextField fx:id="textTitle" layoutX="130.0" layoutY="90.0" prefWidth="190.0" />
+      <TextField fx:id="textImdbLink" layoutX="130.0" layoutY="60.0" prefWidth="190.0" />
+      <Label layoutX="10.0" layoutY="240.0" text="Język">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textLanguage" layoutX="130.0" layoutY="240.0" prefWidth="190.0" />
+      <Label layoutX="10.0" layoutY="270.0" text="Kraj Produkcji">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textCountryOfOrigin" layoutX="130.0" layoutY="270.0" prefWidth="190.0" />
+      <Button fx:id="btnScrapeData" layoutX="10.0" layoutY="350.0" mnemonicParsing="false" onAction="#onBtnScrapeDataAction" prefHeight="30.0" prefWidth="90.0" text="Pobierz Dane" />
+      <Button fx:id="btnLoadData" layoutX="120.0" layoutY="350.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Wczytaj Dane" />
+      <Button fx:id="btnSaveData" layoutX="230.0" layoutY="350.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Zapisz" />
+      <Label layoutX="10.0" layoutY="300.0" text="Okładka Link">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textCoverUrl" layoutX="130.0" layoutY="300.0" prefWidth="190.0" />
+      <Separator layoutY="335.0" prefWidth="330.0" />
+      <TextFlow fx:id="flowTest" layoutX="340.0" layoutY="322.0" prefHeight="26.0" prefWidth="200.0" />
+   </children>
+</AnchorPane>
