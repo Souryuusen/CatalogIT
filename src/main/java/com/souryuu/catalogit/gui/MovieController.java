@@ -3,31 +3,29 @@ package com.souryuu.catalogit.gui;
 import com.souryuu.catalogit.entity.Director;
 import com.souryuu.catalogit.service.DirectorService;
 import com.souryuu.catalogit.service.MovieService;
+import com.souryuu.catalogit.utility.DialogUtility;
 import com.souryuu.catalogit.utility.ScraperUtility;
-import com.souryuu.imdbscrapper.MovieDataExtractor;
 import com.souryuu.imdbscrapper.entity.MovieData;
 import com.souryuu.imdbscrapper.entity.ProductionDetailKeys;
 import javafx.beans.binding.Bindings;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
+import javafx.scene.layout.HBox;
 import net.rgielen.fxweaver.core.FxmlView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
-import java.util.Arrays;
 import java.util.List;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Component
 @FxmlView("movie-view.fxml")
@@ -37,10 +35,10 @@ public class MovieController {
     private final DirectorService directorService;
 
     //##################################################################################################################
+    @FXML HBox hDirectors;
 
     @FXML TextField textImdbLink;
     @FXML TextField textTitle;
-    @FXML TextField textDirectors;
     @FXML TextField textWriters;
     @FXML TextField textReleaseDate;
     @FXML TextField textRuntime;
@@ -90,35 +88,42 @@ public class MovieController {
             BufferedImage image = ImageIO.read(new URL(url));
             viewCoverImage.setImage(SwingFXUtils.toFXImage(image, null));
             viewCoverImage.setPreserveRatio(true);
-        } catch (MalformedURLException ex) {
-            ex.printStackTrace();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    @FXML TextFlow flowTest;
-
     private void addDirectors(List<String> directorsToAdd) {
-        flowTest.getChildren().clear();
+        String styleExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: GREEN;-fx-font-weight:normal;";
+        String styleNotExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: RED;-fx-font-weight:bold;";
+        hDirectors.getChildren().clear();
         if(directorsToAdd != null && directorsToAdd.size() > 0) {
-            Text directorText;
-            Text commaText = new Text(", ");
-            commaText.setStyle("-fx-fill: BLACK;-fx-font-weight:normal;");
+            Label directorLabel;
             for(int i = 0; i < directorsToAdd.size(); i++) {
                 String directorName = ScraperUtility.formatToCamelCase(directorsToAdd.get(i));
                 Director director = new Director(directorName);
-                directorText = new Text();
-                directorText.setText(directorName);
-
-                System.out.println(director);
+                directorLabel = new Label();
                 if(directorService.directorExistInDB(director)) {
-                    directorText.setStyle("-fx-fill: GREEN;-fx-font-weight:normal;");
+                    directorLabel.setStyle(styleExist);
                 } else {
-                    directorText.setStyle("-fx-fill: RED;-fx-font-weight:bold;");
+                    String dialogTitle = "Director Does Not Exist In Database";
+                    String dialogMessage = "The Obtained Director " + director.getName() + " Does Not Exist In Database. Do You Want To Create New Director In Database?";
+                    String dialogYes = "Create";
+                    String dialogNo = "Skip";
+                    Optional<ButtonType> answer = DialogUtility.createConfirmationDialog(dialogTitle, dialogMessage, dialogYes, dialogNo);
+                    if(answer.isPresent()) {
+                        if (answer.get().getText().equalsIgnoreCase(dialogYes)) {
+                            directorService.save(director);
+                            directorLabel.setStyle(styleExist);
+                        } else {
+                            directorLabel.setStyle(styleNotExist);
+                        }
+                    }
                 }
-                flowTest.getChildren().add(directorText);
-                if(i != directorsToAdd.size()-1) flowTest.getChildren().add(commaText);
+                directorLabel.setText(directorName);
+                directorLabel.setAlignment(Pos.CENTER_LEFT);
+                hDirectors.getChildren().add(directorLabel);
+                if(i != directorsToAdd.size()-1) hDirectors.getChildren().add(new Label(", "));
             }
         }
     }
@@ -126,5 +131,6 @@ public class MovieController {
     private void addWriters(List<String> writersToAdd) {
 
     }
+
 
 }
