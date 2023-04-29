@@ -1,8 +1,10 @@
 package com.souryuu.catalogit.gui;
 
 import com.souryuu.catalogit.entity.Director;
+import com.souryuu.catalogit.entity.Writer;
 import com.souryuu.catalogit.service.DirectorService;
 import com.souryuu.catalogit.service.MovieService;
+import com.souryuu.catalogit.service.WriterService;
 import com.souryuu.catalogit.utility.DialogUtility;
 import com.souryuu.catalogit.utility.ScraperUtility;
 import com.souryuu.imdbscrapper.entity.MovieData;
@@ -33,13 +35,14 @@ public class MovieController {
 
     private final MovieService movieService;
     private final DirectorService directorService;
+    private final WriterService writerService;
 
     //##################################################################################################################
     @FXML HBox hDirectors;
+    @FXML HBox hWriters;
 
     @FXML TextField textImdbLink;
     @FXML TextField textTitle;
-    @FXML TextField textWriters;
     @FXML TextField textReleaseDate;
     @FXML TextField textRuntime;
     @FXML TextField textLanguage;
@@ -52,9 +55,10 @@ public class MovieController {
 
     @FXML ImageView viewCoverImage;
 
-    public MovieController(MovieService movieService, DirectorService directorService) {
+    public MovieController(MovieService movieService, DirectorService directorService, WriterService writerService) {
         this.movieService = movieService;
         this.directorService = directorService;
+        this.writerService = writerService;
     }
     //##################################################################################################################
 
@@ -65,6 +69,7 @@ public class MovieController {
 
     @FXML
     public void onBtnScrapeDataAction() {
+
         if(textImdbLink.getText().trim().length() > 0) {
             MovieData scrapedData = ScraperUtility.scrapeData(textImdbLink.getText().trim());
             textTitle.setText(scrapedData.getTitle());
@@ -79,10 +84,19 @@ public class MovieController {
         }
     }
 
+    /**
+     * @author Grzegorz Lach
+     * TODO: Add Verification Of IMDB Link Corectness To Binding (URL Containing "imdb.com" Part)
+     */
     private void createBindings() {
         btnScrapeData.disableProperty().bind(Bindings.isEmpty(textImdbLink.textProperty()));
     }
 
+    /**
+     * @since v0.0.1
+     * @author Grzegorz Lach
+     * @param url String Containing Web Link For Cover Image For Movie
+     */
     private void displayMovieCover(String url) {
         try {
             BufferedImage image = ImageIO.read(new URL(url));
@@ -93,6 +107,12 @@ public class MovieController {
         }
     }
 
+    /**
+     * @since v0.0.1
+     * @author Grzegorz Lach
+     * @param directorsToAdd List Of Directors Scrapped From Web To Be Added
+     * TODO: Externalize Strings Containing Style Data And Dialog Creation Data
+     */
     private void addDirectors(List<String> directorsToAdd) {
         String styleExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: GREEN;-fx-font-weight:normal;";
         String styleNotExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: RED;-fx-font-weight:bold;";
@@ -128,8 +148,45 @@ public class MovieController {
         }
     }
 
+    /**
+     * @since v0.0.1
+     * @author Grzegorz Lach
+     * @param writersToAdd List Of Writers Scrapped From Web To Be Added
+     * TODO: Externalize Strings containing style data and dialog creation data
+     */
     private void addWriters(List<String> writersToAdd) {
-
+        String styleExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: GREEN;-fx-font-weight:normal;";
+        String styleNotExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: RED;-fx-font-weight:bold;";
+        hWriters.getChildren().clear();
+        if(writersToAdd != null && writersToAdd.size() > 0) {
+            Label writerLabel;
+            for(int i = 0; i < writersToAdd.size(); i++) {
+                String writerName = ScraperUtility.formatToCamelCase(writersToAdd.get(i));
+                Writer writer = new Writer(writerName);
+                writerLabel = new Label();
+                if(writerService.writerExistInDB(writer)) {
+                    writerLabel.setStyle(styleExist);
+                } else {
+                    String dialogTitle = "Writer Does Not Exist In Database";
+                    String dialogMessage = "The Obtained Writer " + writer.getName() + " Does Not Exist In Database. Do You Want To Create New Writer In Database?";
+                    String dialogYes = "Create";
+                    String dialogNo = "Skip";
+                    Optional<ButtonType> answer = DialogUtility.createConfirmationDialog(dialogTitle, dialogMessage, dialogYes, dialogNo);
+                    if(answer.isPresent()) {
+                        if (answer.get().getText().equalsIgnoreCase(dialogYes)) {
+                            writerService.save(writer);
+                            writerLabel.setStyle(styleExist);
+                        } else {
+                            writerLabel.setStyle(styleNotExist);
+                        }
+                    }
+                }
+                writerLabel.setText(writerName);
+                writerLabel.setAlignment(Pos.CENTER_LEFT);
+                hWriters.getChildren().add(writerLabel);
+                if(i != writersToAdd.size()-1) hWriters.getChildren().add(new Label(", "));
+            }
+        }
     }
 
 

@@ -36,4 +36,13 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "director_id")
     )
     private Set<Director> directors;
+
+    @Getter @Setter
+    @ManyToMany(cascade = CascadeType.MERGE)
+    @JoinTable(
+            name = "MOVIE_WRITERS",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "writer_id")
+    )
+    private Set<Writer> writers;
 }

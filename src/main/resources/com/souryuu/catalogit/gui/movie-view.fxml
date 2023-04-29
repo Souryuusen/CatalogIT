@@ -51,7 +51,15 @@
          </font>
       </Label>
       <Separator layoutX="330.0" layoutY="325.0" prefWidth="320.0" />
-      <TextField fx:id="textWriters" disable="true" layoutX="130.0" layoutY="183.0" prefHeight="30.0" prefWidth="190.0" />
+      <ScrollPane fitToHeight="true" hbarPolicy="ALWAYS" layoutX="130.0" layoutY="183.0" maxWidth="1.7976931348623157E308" minViewportHeight="26.0" prefHeight="26.0" prefViewportHeight="26.0" prefWidth="190.0" vbarPolicy="NEVER">
+         <content>
+            <HBox fx:id="hWriters" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="188.0">
+               <padding>
+                  <Insets left="3.0" right="3.0" />
+               </padding>
+            </HBox>
+         </content>
+      </ScrollPane>
       <TextField fx:id="textReleaseDate" layoutX="130.0" layoutY="222.0" prefHeight="30.0" prefWidth="190.0" />
       <TextField fx:id="textRuntime" layoutX="130.0" layoutY="262.0" prefHeight="30.0" prefWidth="190.0" />
       <TextField fx:id="textTitle" layoutX="130.0" layoutY="100.0" prefHeight="30.0" prefWidth="190.0" />

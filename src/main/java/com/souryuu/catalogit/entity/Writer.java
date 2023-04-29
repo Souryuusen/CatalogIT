@@ -6,17 +6,17 @@ import lombok.*;
 import java.util.Set;
 
 @Entity
-@Table(name = "Directors")
+@Table(name = "Writers")
 @NoArgsConstructor @RequiredArgsConstructor
 @ToString @EqualsAndHashCode
-public class Director {
+public class Writer {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "director_id") @Getter
-    private long directorID;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "writer_id") @Getter
+    private long writerID;
 
     @Column(name = "name", nullable = false, unique = true) @Getter @Setter @NonNull
     private String name;
 
-    @ManyToMany(mappedBy = "directors")
-    private Set<Movie> directedMovies;
+    @ManyToMany(mappedBy = "writers")
+    private Set<Movie> writtenMovies;
 }
