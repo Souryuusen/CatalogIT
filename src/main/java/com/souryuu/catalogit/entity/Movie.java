@@ -45,4 +45,8 @@ public class Movie {
             inverseJoinColumns = @JoinColumn(name = "writer_id")
     )
     private Set<Writer> writers;
+
+    @Getter @Setter
+    @OneToMany(mappedBy = "reviewedMovie")
+    private Set<Review> reviews;
 }
