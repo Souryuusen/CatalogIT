@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<?import javafx.scene.control.Label?>
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="root"
+            fx:controller="com.souryuu.catalogit.gui.MovieEditDirectorController"
+            stylesheets="@movie-edit-director-view.css"
+            prefHeight="225.0" prefWidth="300.0">
+    <Label>testtesttest</Label>
+</AnchorPane>

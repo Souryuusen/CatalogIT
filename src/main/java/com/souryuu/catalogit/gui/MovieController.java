@@ -13,12 +13,15 @@ import javafx.beans.binding.Bindings;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
@@ -33,11 +36,15 @@ import java.util.Optional;
 @FxmlView("movie-view.fxml")
 public class MovieController {
 
+    private final FxWeaver fxWeaver;
     private final MovieService movieService;
     private final DirectorService directorService;
     private final WriterService writerService;
 
     //##################################################################################################################
+    @FXML AnchorPane root;
+    @FXML AnchorPane detailPane;
+
     @FXML HBox hDirectors;
     @FXML HBox hWriters;
 
@@ -52,13 +59,17 @@ public class MovieController {
     @FXML Button btnScrapeData;
     @FXML Button btnLoadData;
     @FXML Button btnSaveData;
+    @FXML Button btnEditDirector;
+    @FXML Button btnEditWriter;
+    @FXML Button btnAddNewReview;
 
     @FXML ImageView viewCoverImage;
 
-    public MovieController(MovieService movieService, DirectorService directorService, WriterService writerService) {
+    public MovieController(MovieService movieService, DirectorService directorService, WriterService writerService, FxWeaver fxWeaver) {
         this.movieService = movieService;
         this.directorService = directorService;
         this.writerService = writerService;
+        this.fxWeaver = fxWeaver;
     }
     //##################################################################################################################
 
@@ -67,6 +78,10 @@ public class MovieController {
         createBindings();
     }
 
+    /**
+     * @author Grzegorz Lach
+     * @since v0.0.1
+     */
     @FXML
     public void onBtnScrapeDataAction() {
 
@@ -82,6 +97,53 @@ public class MovieController {
             addDirectors(scrapedData.getDirectors());
             addWriters(scrapedData.getWriters());
         }
+    }
+
+    /**
+     * @author Grzegorz Lach
+     * @since v0.0.1
+     */
+    @FXML
+    public void onBtnLoadDataAction() {
+        //TODO: Add Method Implementation
+    }
+
+    /**
+     * @author Grzegorz Lach
+     * @since v0.0.1
+     */
+    @FXML
+    public void onBtnSaveDataAction() {
+        //TODO: Add Method Implementation
+    }
+
+    /**
+     * @author Grzegorz Lach
+     * @since v0.0.1
+     */
+    @FXML
+    public void onBtnEditDirectorAction() {
+        detailPane.getChildren().clear();
+        Node newContent = fxWeaver.load(MovieEditDirectorController.class).getView().get();
+        detailPane.getChildren().setAll(newContent);
+    }
+
+    /**
+     * @author Grzegorz Lach
+     * @since v0.0.1
+     */
+    @FXML
+    public void onBtnEditWriterAction() {
+        //TODO: Add Method Implementation
+    }
+
+    /**
+     * @author Grzegorz Lach
+     * @since v0.0.1
+     */
+    @FXML
+    public void onBtnAddNewReviewAction() {
+        //TODO: Add Method Implementation
     }
 
     /**
@@ -149,6 +211,9 @@ public class MovieController {
     }
 
     /**
+     * Method used for adding new labels representing directors in proper color:<br>
+     *      - Red   - Director Does Not Exist In Database<br>
+     *      - Green - Director Exist In Database<br>
      * @since v0.0.1
      * @author Grzegorz Lach
      * @param writersToAdd List Of Writers Scrapped From Web To Be Added

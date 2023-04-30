@@ -3,6 +3,8 @@ package com.souryuu.catalogit.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.ZonedDateTime;
+
 @Entity
 @Table(name = "REVIEWS")
 @NoArgsConstructor @RequiredArgsConstructor
@@ -20,6 +22,10 @@ public class Review {
     @Getter @Setter @NonNull
     @Column(name = "review")
     private String review;
+
+    @Getter @Setter @NonNull
+    @Column(name = "creation_time")
+    private ZonedDateTime creationData;
 
     @Getter @Setter @NonNull
     @ManyToOne

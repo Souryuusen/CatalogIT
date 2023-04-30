@@ -38,12 +38,18 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <HBox alignment="CENTER" layoutX="340.0" layoutY="10.0" prefHeight="290.0" prefWidth="300.0" style="-fx-background-color: WHITE;" AnchorPane.bottomAnchor="270.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <HBox alignment="CENTER" layoutX="340.0" layoutY="10.0" prefHeight="305.0" prefWidth="300.0" style="-fx-background-color: WHITE;" AnchorPane.bottomAnchor="255.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <ImageView fx:id="viewCoverImage" fitHeight="290.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="viewCoverImage" fitHeight="305.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin></ImageView>
          </children>
+         <padding>
+            <Insets right="10.0" />
+         </padding>
       </HBox>
-      <Separator layoutX="330.0" layoutY="15.0" orientation="VERTICAL" prefHeight="570.0" prefWidth="1.0" />
+      <Separator layoutX="330.0" orientation="VERTICAL" prefHeight="570.0" prefWidth="1.0" />
       <Separator layoutY="50.0" prefWidth="331.0" />
       <Label layoutX="10.0" layoutY="10.0" text="Dodaj Nowy Film">
          <font>
@@ -61,7 +67,7 @@
          </content>
       </ScrollPane>
       <TextField fx:id="textReleaseDate" layoutX="130.0" layoutY="222.0" prefHeight="30.0" prefWidth="190.0" />
-      <TextField fx:id="textRuntime" layoutX="130.0" layoutY="262.0" prefHeight="30.0" prefWidth="190.0" />
+      <TextField fx:id="textRuntime" layoutX="130.0" layoutY="261.0" prefHeight="30.0" prefWidth="190.0" />
       <TextField fx:id="textTitle" layoutX="130.0" layoutY="100.0" prefHeight="30.0" prefWidth="190.0" />
       <TextField fx:id="textImdbLink" layoutX="130.0" layoutY="60.0" prefHeight="30.0" prefWidth="190.0" />
       <Label layoutX="9.0" layoutY="301.0" text="Język">
@@ -69,23 +75,23 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="textLanguage" layoutX="130.0" layoutY="302.0" prefHeight="30.0" prefWidth="190.0" />
+      <TextField fx:id="textLanguage" layoutX="130.0" layoutY="300.0" prefHeight="30.0" prefWidth="190.0" />
       <Label layoutX="11.0" layoutY="343.0" text="Kraj Produkcji">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="textCountryOfOrigin" layoutX="130.0" layoutY="342.0" prefHeight="30.0" prefWidth="190.0" />
-      <Button fx:id="btnScrapeData" layoutX="10.0" layoutY="440.0" mnemonicParsing="false" onAction="#onBtnScrapeDataAction" prefHeight="30.0" prefWidth="90.0" text="Pobierz Dane" />
-      <Button fx:id="btnLoadData" layoutX="120.0" layoutY="440.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Wczytaj Dane" />
-      <Button fx:id="btnSaveData" layoutX="230.0" layoutY="440.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Zapisz" />
+      <TextField fx:id="textCountryOfOrigin" layoutX="130.0" layoutY="340.0" prefHeight="30.0" prefWidth="190.0" />
+      <Button fx:id="btnScrapeData" layoutX="10.0" layoutY="430.0" mnemonicParsing="false" onAction="#onBtnScrapeDataAction" prefHeight="30.0" prefWidth="90.0" text="Pobierz Dane" />
+      <Button fx:id="btnLoadData" layoutX="120.0" layoutY="430.0" mnemonicParsing="false" onAction="#onBtnLoadDataAction" prefHeight="30.0" prefWidth="90.0" text="Wczytaj Dane" />
+      <Button fx:id="btnSaveData" layoutX="230.0" layoutY="430.0" mnemonicParsing="false" onAction="#onBtnSaveDataAction" prefHeight="30.0" prefWidth="90.0" text="Zapisz" />
       <Label layoutX="10.0" layoutY="382.0" text="Okładka Link">
          <font>
             <Font size="18.0" />
          </font>
       </Label>
-      <TextField fx:id="textCoverUrl" layoutX="130.0" layoutY="382.0" prefWidth="190.0" />
-      <Separator layoutY="425.0" prefWidth="330.0" />
+      <TextField fx:id="textCoverUrl" layoutX="130.0" layoutY="380.0" prefHeight="30.0" prefWidth="190.0" />
+      <Separator layoutY="420.0" prefWidth="330.0" />
       <ScrollPane fitToHeight="true" hbarPolicy="ALWAYS" layoutX="130.0" layoutY="140.0" maxWidth="1.7976931348623157E308" minViewportHeight="26.0" prefHeight="26.0" prefViewportHeight="26.0" prefWidth="190.0" vbarPolicy="NEVER">
          <content>
             <HBox fx:id="hDirectors" alignment="CENTER_LEFT" maxWidth="1.7976931348623157E308" minHeight="30.0" minWidth="188.0">
@@ -95,5 +101,9 @@
             </HBox>
          </content>
       </ScrollPane>
+      <AnchorPane fx:id="detailPane" layoutX="340.0" layoutY="335.0" prefHeight="225.0" prefWidth="300.0" />
+      <Button fx:id="btnEditDirector" layoutX="10.0" layoutY="470.0" mnemonicParsing="false" onAction="#onBtnEditDirectorAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Reżysera" />
+      <Button fx:id="btnEditWriter" layoutX="175.0" layoutY="470.0" mnemonicParsing="false" onAction="#onBtnEditWriterAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Scenarzyste" />
+      <Button fx:id="btnAddNewReview" layoutX="93.0" layoutY="510.0" mnemonicParsing="false" onAction="#onBtnAddNewReviewAction" prefHeight="30.0" prefWidth="145.0" text="Dodaj Nową Recenzję" />
    </children>
 </AnchorPane>
