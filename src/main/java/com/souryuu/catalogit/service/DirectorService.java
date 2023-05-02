@@ -5,6 +5,8 @@ import com.souryuu.catalogit.repository.DirectorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class DirectorService {
@@ -17,6 +19,10 @@ public class DirectorService {
 
     public Director save(Director director) {
         return this.repository.save(director);
+    }
+
+    public List<Director> findAll() {
+        return repository.findAll();
     }
 
     public boolean directorExistInDB(Director director) {

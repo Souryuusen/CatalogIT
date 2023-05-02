@@ -10,20 +10,4 @@ import org.springframework.stereotype.Component;
 @FxmlView("movie-edit-writer-view.fxml")
 public class MovieEditWriterController {
 
-    private final WriterService writerService;
-
-    //##################################################################################################################
-
-
-    //##################################################################################################################
-
-    public MovieEditWriterController(WriterService writerService) {
-        this.writerService = writerService;
-    }
-
-    @FXML
-    public void initialize() {
-
-    }
-
 }

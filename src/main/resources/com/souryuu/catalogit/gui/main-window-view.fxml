@@ -11,11 +11,11 @@
 
 <AnchorPane fx:id="root" prefHeight="600" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MainController">
    <children>
-      <SplitPane dividerPositions="0.2" layoutX="5.0" layoutY="31.0" prefHeight="600" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+      <SplitPane dividerPositions="0.2" layoutX="5.0" layoutY="31.0" maxWidth="800.0" minWidth="800.0" prefHeight="600" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
         <items>
           <AnchorPane fx:id="controlRoot" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                <children>
-                  <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="37.0" prefHeight="593.0" prefWidth="150.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="37.0" prefHeight="593.0" prefWidth="120.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Button fx:id="btnTest" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBtnTestAction" prefHeight="30.0" prefWidth="100.0" text="Test" textAlignment="CENTER">
                            <VBox.margin>

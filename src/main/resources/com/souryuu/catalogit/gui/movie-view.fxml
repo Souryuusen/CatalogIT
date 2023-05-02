@@ -38,9 +38,9 @@
             <Font size="18.0" />
          </font>
       </Label>
-      <HBox alignment="CENTER" layoutX="340.0" layoutY="10.0" prefHeight="305.0" prefWidth="300.0" style="-fx-background-color: WHITE;" AnchorPane.bottomAnchor="255.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+      <HBox alignment="CENTER" layoutX="340.0" layoutY="10.0" prefHeight="305.0" prefWidth="290.0" style="-fx-background-color: WHITE;" AnchorPane.bottomAnchor="255.0" AnchorPane.leftAnchor="340.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
          <children>
-            <ImageView fx:id="viewCoverImage" fitHeight="305.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="viewCoverImage" fitHeight="305.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true">
                <HBox.margin>
                   <Insets />
                </HBox.margin></ImageView>

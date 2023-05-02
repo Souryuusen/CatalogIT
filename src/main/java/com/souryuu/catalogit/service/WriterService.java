@@ -4,6 +4,8 @@ import com.souryuu.catalogit.entity.Writer;
 import com.souryuu.catalogit.repository.WriterRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class WriterService {
 
@@ -15,6 +17,10 @@ public class WriterService {
 
     public Writer save(Writer writer) {
         return this.repository.save(writer);
+    }
+
+    public List<Writer> findAll() {
+        return repository.findAll();
     }
 
     public boolean writerExistInDB(Writer writer) {

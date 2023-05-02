@@ -10,14 +10,14 @@ import com.souryuu.catalogit.utility.ScraperUtility;
 import com.souryuu.imdbscrapper.entity.MovieData;
 import com.souryuu.imdbscrapper.entity.ProductionDetailKeys;
 import javafx.beans.binding.Bindings;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -26,11 +26,11 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
-import java.util.List;
+import java.util.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @FxmlView("movie-view.fxml")
@@ -44,9 +44,15 @@ public class MovieController {
     //##################################################################################################################
     @FXML AnchorPane root;
     @FXML AnchorPane detailPane;
+    @FXML AnchorPane editDirectorRoot;
+    @FXML AnchorPane editWriterRoot;
 
     @FXML HBox hDirectors;
     @FXML HBox hWriters;
+    @FXML HBox hAddNewDirector;
+    @FXML HBox hRemoveDirector;
+    @FXML HBox hAddNewWriter;
+    @FXML HBox hRemoveWriter;
 
     @FXML TextField textImdbLink;
     @FXML TextField textTitle;
@@ -55,6 +61,8 @@ public class MovieController {
     @FXML TextField textLanguage;
     @FXML TextField textCountryOfOrigin;
     @FXML TextField textCoverUrl;
+    @FXML TextField textNewDirectorName;
+    @FXML TextField textNewWriterName;
 
     @FXML Button btnScrapeData;
     @FXML Button btnLoadData;
@@ -62,8 +70,23 @@ public class MovieController {
     @FXML Button btnEditDirector;
     @FXML Button btnEditWriter;
     @FXML Button btnAddNewReview;
+    @FXML Button btnAddNewDirector;
+    @FXML Button btnRemoveDirector;
+    @FXML Button btnAddNewWriter;
+    @FXML Button btnRemoveWriter;
+
+    @FXML ComboBox<String> comboRemoveDirector;
+    @FXML ComboBox<String> comboRemoveWriter;
 
     @FXML ImageView viewCoverImage;
+
+    @FXML TableView tableDirectors;
+    @FXML TableView tableWriters;
+
+    @FXML TableColumn<Director, Long> columnDirectorsID;
+    @FXML TableColumn<Director, String> columnDirectorsName;
+    @FXML TableColumn<Writer, Long> columnWritersID;
+    @FXML TableColumn<Writer, String> columnWritersName;
 
     public MovieController(MovieService movieService, DirectorService directorService, WriterService writerService, FxWeaver fxWeaver) {
         this.movieService = movieService;
@@ -84,8 +107,8 @@ public class MovieController {
      */
     @FXML
     public void onBtnScrapeDataAction() {
-
         if(textImdbLink.getText().trim().length() > 0) {
+            detailPane.getChildren().clear();
             MovieData scrapedData = ScraperUtility.scrapeData(textImdbLink.getText().trim());
             textTitle.setText(scrapedData.getTitle());
             textCoverUrl.setText(scrapedData.getCoverURL());
@@ -123,9 +146,84 @@ public class MovieController {
      */
     @FXML
     public void onBtnEditDirectorAction() {
+        // Parsing Current Directors List
+        HashSet<Director> currentDirectors = (HashSet<Director>)obtainCurrentDirectors();
+        // Creating List Of Directors Names
+        List<String> currentDirectorNames = new ArrayList<>(currentDirectors.size());
+        currentDirectors.stream().sorted().forEach(d -> currentDirectorNames.add(d.getName()));
+        // Setting New Content To Display On detailsPane
         detailPane.getChildren().clear();
         Node newContent = fxWeaver.load(MovieEditDirectorController.class).getView().get();
         detailPane.getChildren().setAll(newContent);
+        // Setting Of Elements Bindings
+        btnAddNewDirector.disableProperty().bind(Bindings.isEmpty(textNewDirectorName.textProperty()));
+        btnRemoveDirector.disableProperty().bind(Bindings.isNull(comboRemoveDirector.valueProperty()));
+        // Filling ComboBox Data From
+        comboRemoveDirector.setItems(FXCollections.observableList(currentDirectorNames));
+        // Initialize Tables Properties
+        columnDirectorsID.setCellValueFactory(new PropertyValueFactory<>("directorID"));
+        columnDirectorsID.setSortType(TableColumn.SortType.ASCENDING);
+        columnDirectorsName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        // Table Row Clicked Listener
+        tableDirectors.setRowFactory(rf -> {
+            TableRow<Director> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Director rowData = row.getItem();
+                    textNewDirectorName.setText(rowData.getName());
+                }
+            });
+            return row ;
+        });
+        // Filling TableView With Database Entries
+        tableDirectors.getItems().clear();
+        tableDirectors.setItems(FXCollections.observableList(directorService.findAll()));
+        // Sorting Table By Director ID Field
+        tableDirectors.getSortOrder().add(columnDirectorsID);
+        tableDirectors.sort();
+    }
+
+    @FXML
+    public void onBtnAddNewDirectorAction() {
+        if(textNewDirectorName.getText().trim().length() > 0) {
+            // Retrieve New Director Name
+            String newDirectorName = ScraperUtility.formatToCamelCase(textNewDirectorName.getText().trim());
+            // Retrieve HashSet Of All Added Directors
+            HashSet<Director> addedDirectors = (HashSet<Director>) obtainCurrentDirectors();
+            addedDirectors.add(new Director(newDirectorName));
+            // Creating Names List To Transform Into Labels
+            ArrayList<String> addedDirectorNames = new ArrayList<>(addedDirectors.size() + 1);
+            addedDirectors.stream().forEach(d -> addedDirectorNames.add(d.getName()));
+            // Updating Directors
+            addDirectors(addedDirectorNames);
+            // Updating Remove ComboBox
+            comboRemoveDirector.setItems(FXCollections.observableList(addedDirectorNames));
+            // Clearing Text Fields...
+            textNewDirectorName.setText("");
+            // Refreshing TableView With Database Entries
+            tableDirectors.getItems().clear();
+            tableDirectors.setItems(FXCollections.observableList(directorService.findAll()));
+            // Sorting Table By Director ID Field
+            tableDirectors.getSortOrder().add(columnDirectorsID);
+            tableDirectors.sort();
+        }
+    }
+
+    @FXML
+    public void onBtnRemoveDirectorAction() {
+        if(comboRemoveDirector.getValue() != null && !comboRemoveDirector.getValue().trim().equalsIgnoreCase("")) {
+            Director directorToRemove = new Director(comboRemoveDirector.getSelectionModel().getSelectedItem());
+            // Parsing Current Directors List
+            HashSet<Director> currentDirectors = (HashSet<Director>)obtainCurrentDirectors();
+            boolean removed = currentDirectors.remove(directorToRemove);
+            if(removed) {
+                List<String> addedDirectorNames = currentDirectors.stream().map(d -> d.getName()).collect(Collectors.toList());
+                // Updating Directors
+                addDirectors(addedDirectorNames);
+                // Updating Remove ComboBox
+                comboRemoveDirector.setItems(FXCollections.observableList(addedDirectorNames));
+            }
+        }
     }
 
     /**
@@ -134,7 +232,84 @@ public class MovieController {
      */
     @FXML
     public void onBtnEditWriterAction() {
-        //TODO: Add Method Implementation
+        // Parsing Current Directors List
+        HashSet<Writer> currentWriters = (HashSet<Writer>)obtainCurrentWriters();
+        // Creating List Of Directors Names
+        List<String> currentWritersNames = new ArrayList<>(currentWriters.size());
+        currentWriters.stream().sorted().forEach(d -> currentWritersNames.add(d.getName()));
+        // Setting New Content To Display On detailsPane
+        detailPane.getChildren().clear();
+        Node newContent = fxWeaver.load(MovieEditWriterController.class).getView().get();
+        detailPane.getChildren().setAll(newContent);
+        // Setting Of Elements Bindings
+        btnAddNewWriter.disableProperty().bind(Bindings.isEmpty(textNewWriterName.textProperty()));
+        btnRemoveWriter.disableProperty().bind(Bindings.isNull(comboRemoveWriter.valueProperty()));
+        // Filling ComboBox Data From
+        comboRemoveWriter.setItems(FXCollections.observableList(currentWritersNames));
+        // Initialize Tables Properties
+        columnWritersID.setCellValueFactory(new PropertyValueFactory<>("writerID"));
+        columnWritersID.setSortType(TableColumn.SortType.ASCENDING);
+        columnWritersName.setCellValueFactory(new PropertyValueFactory<>("name"));
+        // Table Row Clicked Listener
+        tableWriters.setRowFactory(rf -> {
+            TableRow<Writer> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+                if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                    Writer rowData = row.getItem();
+                    textNewWriterName.setText(rowData.getName());
+                }
+            });
+            return row ;
+        });
+        // Filling TableView With Database Entries
+        tableWriters.getItems().clear();
+        tableWriters.setItems(FXCollections.observableList(writerService.findAll()));
+        // Sorting Table By Director ID Field
+        tableWriters.getSortOrder().add(columnWritersID);
+        tableWriters.sort();
+    }
+
+    @FXML
+    public void onBtnAddNewWriterAction() {
+        if(textNewWriterName.getText().trim().length() > 0) {
+            // Retrieve New Director Name
+            String newWriterName = ScraperUtility.formatToCamelCase(textNewWriterName.getText().trim());
+            // Retrieve HashSet Of All Added Directors
+            HashSet<Writer> addedWriters = (HashSet<Writer>) obtainCurrentWriters();
+            addedWriters.add(new Writer(newWriterName));
+            // Creating Names List To Transform Into Labels
+            ArrayList<String> addedWritersNames = new ArrayList<>(addedWriters.size() + 1);
+            addedWriters.stream().forEach(w -> addedWritersNames.add(w.getName()));
+            // Updating Directors
+            addWriters(addedWritersNames);
+            // Updating Remove ComboBox
+            comboRemoveWriter.setItems(FXCollections.observableList(addedWritersNames));
+            // Clearing Text Fields...
+            textNewWriterName.setText("");
+            // Refreshing TableView With Database Entries
+            tableWriters.getItems().clear();
+            tableWriters.setItems(FXCollections.observableList(writerService.findAll()));
+            // Sorting Table By Director ID Field
+            tableWriters.getSortOrder().add(columnWritersID);
+            tableWriters.sort();
+        }
+    }
+
+    @FXML
+    public void onBtnRemoveWriterAction() {
+        if(comboRemoveWriter.getValue() != null && !comboRemoveWriter.getValue().trim().equalsIgnoreCase("")) {
+            Writer writerToRemove = new Writer(comboRemoveWriter.getSelectionModel().getSelectedItem());
+            // Parsing Current Directors List
+            HashSet<Writer> currentWriters = (HashSet<Writer>)obtainCurrentWriters();
+            boolean removed = currentWriters.remove(writerToRemove);
+            if(removed) {
+                List<String> addedWritersNames = currentWriters.stream().map(w -> w.getName()).collect(Collectors.toList());
+                // Updating Directors
+                addWriters(addedWritersNames);
+                // Updating Remove ComboBox
+                comboRemoveWriter.setItems(FXCollections.observableList(addedWritersNames));
+            }
+        }
     }
 
     /**
@@ -175,7 +350,7 @@ public class MovieController {
      * @param directorsToAdd List Of Directors Scrapped From Web To Be Added
      * TODO: Externalize Strings Containing Style Data And Dialog Creation Data
      */
-    private void addDirectors(List<String> directorsToAdd) {
+    protected void addDirectors(List<String> directorsToAdd) {
         String styleExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: GREEN;-fx-font-weight:normal;";
         String styleNotExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: RED;-fx-font-weight:bold;";
         hDirectors.getChildren().clear();
@@ -219,7 +394,7 @@ public class MovieController {
      * @param writersToAdd List Of Writers Scrapped From Web To Be Added
      * TODO: Externalize Strings containing style data and dialog creation data
      */
-    private void addWriters(List<String> writersToAdd) {
+    protected void addWriters(List<String> writersToAdd) {
         String styleExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: GREEN;-fx-font-weight:normal;";
         String styleNotExist = "-fx-background-color: white; -fx-max-width: 300; -fx-text-fill: RED;-fx-font-weight:bold;";
         hWriters.getChildren().clear();
@@ -254,5 +429,44 @@ public class MovieController {
         }
     }
 
+    /**
+     * Function For Returning Currently Added Directors (Given As Labels!)
+     * @since v0.0.1
+     * @author Grzegorz Lach
+     * @return Set Of Director Objects Representing Currently Added Directors
+     */
+    private Set<Director> obtainCurrentDirectors() {
+        // Returned Set
+        HashSet<Director> obtainedSet = new HashSet<>();
+        // Parsing Labels To Directors
+        ObservableList<Node> elements = hDirectors.getChildren();
+        for(Node e : elements) {
+            if(e != null && e instanceof Label) {
+                Label label = (Label) e;
+                if(!label.getText().trim().equalsIgnoreCase(",")) {
+                    Director parsedDirector = new Director(label.getText());
+                    if(!obtainedSet.contains(parsedDirector)) obtainedSet.add(parsedDirector);
+                }
+            }
+        }
+        return obtainedSet;
+    }
+
+    private Set<Writer> obtainCurrentWriters() {
+        // Returned Set
+        HashSet<Writer> obtainedSet = new HashSet<>();
+        // Parsing Labels To Directors
+        ObservableList<Node> elements = hWriters.getChildren();
+        for(Node e : elements) {
+            if(e != null && e instanceof Label) {
+                Label label = (Label) e;
+                if(!label.getText().trim().equalsIgnoreCase(",")) {
+                    Writer parsedWriter = new Writer(label.getText());
+                    if(!obtainedSet.contains(parsedWriter)) obtainedSet.add(parsedWriter);
+                }
+            }
+        }
+        return obtainedSet;
+    }
 
 }

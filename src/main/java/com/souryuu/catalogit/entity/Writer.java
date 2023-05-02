@@ -17,6 +17,6 @@ public class Writer {
     @Column(name = "name", nullable = false, unique = true) @Getter @Setter @NonNull
     private String name;
 
-    @ManyToMany(mappedBy = "writers")
+    @ManyToMany(mappedBy = "writers", fetch = FetchType.EAGER)
     private Set<Movie> writtenMovies;
 }
