@@ -1,14 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.souryuu.catalogit.gui.MovieAddReviewController"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane fx:id="addReviewRoot" prefHeight="225.0" prefWidth="300.0" stylesheets="@movie-edit-director-view.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MovieController">
+   <children>
+      <Separator layoutX="6.0" layoutY="43.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0" />
+      <HBox alignment="CENTER" layoutX="29.0" layoutY="43.0" prefHeight="30.0" prefWidth="300.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <Label text="Dodaj Nową Recenzję" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="50.0" layoutY="42.0" prefHeight="30.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="35.0">
+         <children>
+            <Label text="Ocena" />
+            <Slider blockIncrement="0.5" majorTickUnit="1.0" max="10.0" minorTickCount="1" prefWidth="220.0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0">
+               <HBox.margin>
+                  <Insets left="10.0" right="10.0" />
+               </HBox.margin>
+            </Slider>
+         </children>
+      </HBox>
+      <HBox alignment="CENTER" layoutX="50.0" layoutY="112.19999694824219" AnchorPane.bottomAnchor="70.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="70.0">
+         <children>
+            <ScrollPane hbarPolicy="NEVER" prefHeight="90.0" prefWidth="280.0">
+               <content>
+                  <TextArea prefHeight="90.0" prefWidth="280.0" promptText="Wpisz tekst recenzji.... (MAX. 250 znaków)" wrapText="true" />
+               </content>
+            </ScrollPane>
+         </children>
+      </HBox>
+   </children>
 </AnchorPane>

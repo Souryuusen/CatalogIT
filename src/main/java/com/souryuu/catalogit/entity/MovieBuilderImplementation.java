@@ -24,6 +24,10 @@ public class MovieBuilderImplementation implements MovieBuilder {
     private String coverUrl;
     @Setter(AccessLevel.PRIVATE) @Getter(AccessLevel.PRIVATE)
     Set<Director> directorSet = new HashSet<>();
+    @Setter(AccessLevel.PRIVATE) @Getter(AccessLevel.PRIVATE)
+    Set<Writer> writerSet = new HashSet<>();
+    @Setter(AccessLevel.PRIVATE) @Getter(AccessLevel.PRIVATE)
+    Set<Review> reviewSet = new HashSet<>();
 
     @Override
     public MovieBuilder withTitle(String title) {
@@ -34,6 +38,18 @@ public class MovieBuilderImplementation implements MovieBuilder {
     @Override
     public MovieBuilder withDirectors(Director... directors) {
         Arrays.asList(directors).stream().filter(director -> director != null).forEach(director -> directorSet.add(director));
+        return this;
+    }
+
+    @Override
+    public MovieBuilder withWriters(Writer... writers) {
+        Arrays.asList(writers).stream().filter(writer -> writer != null).forEach(writer -> writerSet.add(writer));
+        return this;
+    }
+
+    @Override
+    public MovieBuilder withReviews(Review... reviews) {
+        Arrays.asList(reviews).stream().filter(review -> review != null).forEach(review -> reviewSet.add(review));
         return this;
     }
 
@@ -77,6 +93,8 @@ public class MovieBuilderImplementation implements MovieBuilder {
         m.setReleaseDate(getReleaseDate());
         m.setCoverUrl(getCoverUrl());
         m.setDirectors(directorSet);
+        m.setWriters(writerSet);
+        m.setReviews(reviewSet);
         return m;
     }
 }

@@ -1,6 +1,7 @@
 package com.souryuu.catalogit.service;
 
 import com.souryuu.catalogit.entity.Director;
+import com.souryuu.catalogit.entity.Movie;
 import com.souryuu.catalogit.repository.DirectorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -23,6 +24,10 @@ public class DirectorService {
 
     public List<Director> findAll() {
         return repository.findAll();
+    }
+
+    public List<Director> findDirectorsOfMovie(Movie movie) {
+        return repository.findDirectorByDirectedMoviesContains(movie);
     }
 
     public boolean directorExistInDB(Director director) {

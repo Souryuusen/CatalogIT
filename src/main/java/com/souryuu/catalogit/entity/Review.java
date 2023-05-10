@@ -1,5 +1,7 @@
 package com.souryuu.catalogit.entity;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +10,8 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "REVIEWS")
 @NoArgsConstructor @RequiredArgsConstructor
-public class Review {
+@ToString
+public class Review extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Setter @Getter
@@ -17,7 +20,7 @@ public class Review {
 
     @Getter @Setter @NonNull
     @Column(name = "rating", nullable = false)
-    private byte rating;
+    private int rating;
 
     @Getter @Setter @NonNull
     @Column(name = "review")
@@ -27,7 +30,7 @@ public class Review {
     @Column(name = "creation_time")
     private ZonedDateTime creationData;
 
-    @Getter @Setter @NonNull
+    @Getter @Setter @NonNull @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "movieID", nullable = false)
     private Movie reviewedMovie;

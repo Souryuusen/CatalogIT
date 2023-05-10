@@ -1,6 +1,7 @@
 package com.souryuu.catalogit.gui;
 
 import com.souryuu.catalogit.entity.Director;
+import com.souryuu.catalogit.entity.Movie;
 import com.souryuu.catalogit.entity.Writer;
 import com.souryuu.catalogit.service.DirectorService;
 import com.souryuu.catalogit.service.MovieService;
@@ -21,11 +22,13 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
+import java.io.File;
 import java.util.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -40,6 +43,10 @@ public class MovieController {
     private final MovieService movieService;
     private final DirectorService directorService;
     private final WriterService writerService;
+
+    //##################################################################################################################
+
+    private Movie currentMovie;
 
     //##################################################################################################################
     @FXML AnchorPane root;
@@ -108,17 +115,32 @@ public class MovieController {
     @FXML
     public void onBtnScrapeDataAction() {
         if(textImdbLink.getText().trim().length() > 0) {
+            // Clear Detail Pane
             detailPane.getChildren().clear();
-            MovieData scrapedData = ScraperUtility.scrapeData(textImdbLink.getText().trim());
-            textTitle.setText(scrapedData.getTitle());
-            textCoverUrl.setText(scrapedData.getCoverURL());
-            textRuntime.setText(scrapedData.getRuntime());
-            textReleaseDate.setText(scrapedData.getProductionDetails().get(ProductionDetailKeys.RELEASE_DATE));
-            textCountryOfOrigin.setText(scrapedData.getProductionDetails().get(ProductionDetailKeys.COUNTRY_OF_ORIGIN));
-            textLanguage.setText(scrapedData.getProductionDetails().get(ProductionDetailKeys.LANGUAGE));
-            displayMovieCover(scrapedData.getCoverURL());
-            addDirectors(scrapedData.getDirectors());
-            addWriters(scrapedData.getWriters());
+            // Verification If Movie With This URL Exists In DB
+            Movie currentMovie = movieService.getMovieByImdbUrl(textImdbLink.getText().trim().toLowerCase());
+            if(currentMovie != null && currentMovie.getImdbUrl().equalsIgnoreCase(textImdbLink.getText())) {
+                System.out.println("debug out");
+            } else {
+                MovieData scrapedData = ScraperUtility.scrapeData(textImdbLink.getText().trim());
+                textTitle.setText(scrapedData.getTitle());
+                textCoverUrl.setText(scrapedData.getCoverURL());
+                textRuntime.setText(scrapedData.getRuntime());
+                textReleaseDate.setText(scrapedData.getProductionDetails().get(ProductionDetailKeys.RELEASE_DATE));
+                textCountryOfOrigin.setText(scrapedData.getProductionDetails().get(ProductionDetailKeys.COUNTRY_OF_ORIGIN));
+                textLanguage.setText(scrapedData.getProductionDetails().get(ProductionDetailKeys.LANGUAGE));
+                displayMovieCover(scrapedData.getCoverURL());
+                addDirectors(scrapedData.getDirectors());
+                addWriters(scrapedData.getWriters());
+            }
+
+
+
+
+
+
+
+
         }
     }
 
@@ -318,7 +340,10 @@ public class MovieController {
      */
     @FXML
     public void onBtnAddNewReviewAction() {
-        //TODO: Add Method Implementation
+        // Setting New Content To Display On detailsPane
+        detailPane.getChildren().clear();
+        Node newContent = fxWeaver.load(MovieAddReviewController.class).getView().get();
+        detailPane.getChildren().setAll(newContent);
     }
 
     /**
