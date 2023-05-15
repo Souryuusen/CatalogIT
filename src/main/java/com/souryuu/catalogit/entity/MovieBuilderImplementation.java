@@ -85,7 +85,7 @@ public class MovieBuilderImplementation implements MovieBuilder {
 
     @Override
     public Movie build() {
-        Movie m = new Movie();
+        Movie m = new Movie(getImdbUrl());
         m.setTitle(getTitle());
         m.setLanguage(getLanguage());
         m.setImdbUrl(getImdbUrl());

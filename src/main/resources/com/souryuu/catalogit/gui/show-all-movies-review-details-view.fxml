@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.layout.AnchorPane?>
+
+
+<AnchorPane fx:id="paneReviewDetailsRoot" prefHeight="210.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MovieListController">
+   <children>
+      <ScrollPane fx:id="scrollReviewsList" hbarPolicy="NEVER" layoutX="24.0" layoutY="330.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="350.0" AnchorPane.topAnchor="10.0">
+         <content>
+            <TableView prefHeight="200.0" prefWidth="270.0">
+               <columns>
+                  <TableColumn fx:id="columnReviewID" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" text="#" />
+                  <TableColumn fx:id="columnReviewCreation" maxWidth="142.40002059936523" minWidth="100.0" prefWidth="150.0" text="Data Utworzenia" />
+                  <TableColumn fx:id="columnReviewRating" prefWidth="70.0" text="Ocena" />
+               </columns>
+            </TableView>
+         </content>
+      </ScrollPane>
+      <TextArea fx:id="areaReviewBody" editable="false" layoutX="330.0" layoutY="340.0" prefHeight="200.0" prefWidth="200.0" wrapText="true" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+   </children>
+</AnchorPane>

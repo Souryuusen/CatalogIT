@@ -4,7 +4,9 @@ import com.souryuu.catalogit.entity.*;
 import com.souryuu.catalogit.service.DirectorService;
 import com.souryuu.catalogit.service.MovieService;
 import com.souryuu.catalogit.service.ReviewService;
+import jakarta.persistence.Persistence;
 import jakarta.transaction.Transactional;
+import org.hibernate.Hibernate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -26,38 +28,56 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        addRandomMovies(2);
-
-        try{
-            Thread.sleep(5000);
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
-        }
-
-        fetchMovies();
+//        addRandomMovies(2);
+//
+//        try{
+//            Thread.sleep(5000);
+//        } catch (InterruptedException ex) {
+//            ex.printStackTrace();
+//        }
+//
+//        fetchMovies();
     }
 
     private void addRandomMovies(int amount) {
-        for(int i = 1; i <= amount; i++) {
-            Movie m = new MovieBuilderImplementation().withTitle("Test Movie: " + (i)).withReleaseDate("" + (1970+i))
-                            .withRuntime("1h " + i + "m " + i + "s").withLanguage("Polish")
-                            .withImdbUrl("www.imdb.com/" + i).withCoverUrl("www.img.com/" + i).build();
-            m.addDirector(new Director("John " + i + " Wicked"));
-            m.addWriter(new Writer("Writer " + i + " Test"));
-            movieService.save(m);
-            Review review = new Review(55, "To jest Recenzja... " + i + "!!", ZonedDateTime.now(), m);
-            reviewService.save(review);
-        }
+        /*for(int i = 1; i <= amount; i++) {
+
+            String link = "www.imdb.com/" + (i+50);
+            Movie fetchedMovie = movieService.getMovieByImdbUrlWithAll(link);
+
+            if(fetchedMovie == null) {
+                Movie m = new MovieBuilderImplementation().withTitle("Test Movie: " + (i)).withReleaseDate("" + (1970 + i))
+                        .withRuntime("1h " + i + "m " + i + "s").withLanguage("Polish")
+                        .withImdbUrl(link).withCoverUrl("www.img.com/" + i).build();
+                m.addDirector(new Director("John " + i + " Wicked"));
+                m.addWriter(new Writer("Writer " + i + " Test"));
+                Review review = new Review(55, "To jest Recenzja... " + i + "!!", ZonedDateTime.now(), m);
+                Review review2 = new Review(55, "To jest Recenzja... " + i + 1 + "!!", ZonedDateTime.now(), m);
+                Review review3 = new Review(55, "To jest Recenzja... " + i + 2 + "!!", ZonedDateTime.now(), m);
+                m.addReview(review);
+                m.addReview(review2);
+                m.addReview(review3);
+                movieService.save(m);
+            } else {
+                fetchedMovie.addDirector(new Director("John " + (i+100) + " Wicked"));
+                movieService.save(fetchedMovie);
+            }
+//            reviewService.save(review);
+        }*/
     }
 
     @Transactional
     private void fetchMovies() {
-        Movie m = movieService.getMovieWithAll(1l);
+        Movie m = movieService.getMovieWithInitialization(1l);
 
         List<Director> directors = directorService.findDirectorsOfMovie(m);
 
-        for(Director d : directors) System.out.println(d);
-        System.out.println(m);
+        for(Director d : directors) {
+            System.out.println(d);
+            for(Movie movie : d.getDirectedMovies()) {
+                System.out.println(movie);
+            }
+        }
 
         System.out.println("");
     }

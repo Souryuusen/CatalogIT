@@ -17,12 +17,12 @@
                <children>
                   <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="37.0" prefHeight="593.0" prefWidth="120.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <Button fx:id="btnTest" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBtnTestAction" prefHeight="30.0" prefWidth="100.0" text="Test" textAlignment="CENTER">
+                        <Button fx:id="btnAddNewMovie" onAction="#onBtnAddNewMovieAction" prefHeight="30.0" prefWidth="120.0" text="Dodaj Nowy Film" textAlignment="CENTER" wrapText="true">
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
                         </Button>
-                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
+                        <Button fx:id="btnViewAllMovies" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBtnViewAllMoviesAction" prefHeight="30.0" prefWidth="120.0" text="Przeglądaj Filmy" />
                         <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
                         <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
                         <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />

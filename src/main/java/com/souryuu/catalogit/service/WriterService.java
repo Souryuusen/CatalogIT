@@ -1,5 +1,6 @@
 package com.souryuu.catalogit.service;
 
+import com.souryuu.catalogit.entity.Director;
 import com.souryuu.catalogit.entity.Writer;
 import com.souryuu.catalogit.repository.WriterRepository;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,12 @@ public class WriterService {
         return repository.findAll();
     }
 
-    public boolean writerExistInDB(Writer writer) {
-        return this.repository.countWriterByNameIsIgnoreCase(writer.getName()) > 0;
+    public Writer getWriterByNameEqualsIgnoreCase(String name) {
+        return this.repository.getWriterByNameEqualsIgnoreCase(name);
+    }
+
+    public boolean existsByNameIgnoreCase(String name) {
+        return this.repository.existsByNameIgnoreCase(name);
     }
 
 

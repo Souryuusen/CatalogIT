@@ -7,6 +7,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface WriterRepository extends JpaRepository<Writer, Long> {
 
+    Writer getWriterByNameEqualsIgnoreCase(String name);
+
     int countWriterByNameIsIgnoreCase(String name);
+
+    boolean existsByNameIgnoreCase(String name);
 
 }

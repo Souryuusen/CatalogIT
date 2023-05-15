@@ -111,6 +111,7 @@
       <AnchorPane fx:id="detailPane" layoutX="340.0" layoutY="335.0" prefHeight="225.0" prefWidth="300.0" />
       <Button fx:id="btnEditDirector" layoutX="10.0" layoutY="470.0" mnemonicParsing="false" onAction="#onBtnEditDirectorAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Reżysera" />
       <Button fx:id="btnEditWriter" layoutX="175.0" layoutY="470.0" mnemonicParsing="false" onAction="#onBtnEditWriterAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Scenarzyste" />
-      <Button fx:id="btnAddNewReview" layoutX="93.0" layoutY="510.0" mnemonicParsing="false" onAction="#onBtnAddNewReviewAction" prefHeight="30.0" prefWidth="145.0" text="Dodaj Nową Recenzję" />
+      <Button fx:id="btnAddNewReview" layoutX="10.0" layoutY="510.0" mnemonicParsing="false" onAction="#onBtnAddNewReviewAction" prefHeight="30.0" prefWidth="145.0" text="Dodaj Nową Recenzję" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="510.0" />
+      <Button fx:id="btnEditReview" layoutX="175.0" layoutY="510.0" mnemonicParsing="false" onAction="#onBtnEditReviewAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Recenzje" AnchorPane.leftAnchor="175.0" AnchorPane.topAnchor="510.0" />
    </children>
 </AnchorPane>

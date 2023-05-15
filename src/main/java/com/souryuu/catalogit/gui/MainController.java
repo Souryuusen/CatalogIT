@@ -18,51 +18,32 @@ import java.util.Arrays;
 @FxmlView("main-window-view.fxml")
 public class MainController {
 
-    private final HostServices hostServices;
     private final FxWeaver fxWeaver;
 
     @FXML
     AnchorPane root, menuRoot, controlRoot, contentRoot;
 
     @FXML
-    Button btnTest;
+    Button btnAddNewMovie;
+    @FXML Button btnViewAllMovies;
 
-    @FXML
-    SubScene contentSubScene;
-
-//    @FXML
-//    TextField keywordTextField;
-
-    @FXML
-    Button searchButton;
-
-
-    public MainController(HostServices hostServices, FxWeaver fxWeaver) {
-        this.hostServices = hostServices;
+    public MainController(FxWeaver fxWeaver) {
         this.fxWeaver = fxWeaver;
     }
 
     @FXML
-    public void onBtnTestAction() {
+    public void onBtnAddNewMovieAction() {
         changeDisplayedContent(MovieController.class);
     }
 
+    public void onBtnViewAllMoviesAction() {
+        changeDisplayedContent(MovieListController.class);
+    }
+
     private void changeDisplayedContent(Class clazz) {
+        contentRoot.getChildren().clear();
         Node newContent = (Node) fxWeaver.load(clazz).getView().get();
         contentRoot.getChildren().setAll(newContent);
     }
 
-//    @FXML
-//    public void initialize() {
-//        this.searchButton.setOnAction(action ->{
-//            this.hostServices.showDocument("https://www.google.ca/search?q=" + this.keywordTextField.getText().trim());
-//        });
-//    }
-
-//    @FXML
-//    public void aboutMenuItemClicked() {
-////        this.fxWeaver.loadController(AboutController.class).show();
-////        this.fxWeaver.loadView(AboutController.class);
-//        ((Stage)root.getScene().getWindow()).setScene(this.fxWeaver.loadView(AboutController.class).getScene());
-//    }
 }

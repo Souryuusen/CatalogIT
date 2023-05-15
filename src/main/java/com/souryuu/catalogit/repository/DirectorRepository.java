@@ -10,10 +10,10 @@ import java.util.List;
 
 @Repository
 public interface DirectorRepository extends JpaRepository<Director, Long> {
-    List<Director> findDirectorByNameIsIgnoreCase(String name);
+
+    Director getDirectorByNameEqualsIgnoreCase(String name);
 
     List<Director> findDirectorByDirectedMoviesContains(Movie movie);
 
-
-    int countDirectorByNameIsIgnoreCase(String name);
+    boolean existsByNameIgnoreCase(String name);
 }

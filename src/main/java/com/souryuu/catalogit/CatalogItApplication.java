@@ -5,8 +5,13 @@ import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.spring.SpringFxWeaver;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+
+import javax.sql.DataSource;
 
 @SpringBootApplication
 public class CatalogItApplication {
@@ -19,5 +24,6 @@ public class CatalogItApplication {
     public FxWeaver fxWeaver(ConfigurableApplicationContext applicationContext) {
         return new SpringFxWeaver(applicationContext);
     }
+
 
 }

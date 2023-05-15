@@ -14,15 +14,9 @@ import org.springframework.beans.factory.annotation.Value;
 public class StageReadyEventListener implements ApplicationListener<StageReadyEvent> {
 
     private final ApplicationContext context;
-    private final String applicationTitle;
-    private final String labelText;
 
-    public StageReadyEventListener(ApplicationContext context,
-                                   @Value("${app.title}") String applicationTitle,
-                                   @Value("${app.testlabel}") String labelText) {
+    public StageReadyEventListener(ApplicationContext context) {
         this.context = context;
-        this.applicationTitle = applicationTitle;
-        this.labelText = labelText;
     }
 
     @Override
@@ -32,7 +26,7 @@ public class StageReadyEventListener implements ApplicationListener<StageReadyEv
         Parent root = fxWeaver.loadView(MainController.class);
         Scene scene = new Scene(root);
         stage.setScene(scene);
-        stage.setTitle(this.applicationTitle);
+        stage.setTitle("CatalogIT v0.0.1");
         stage.setResizable(false);
         stage.show();
     }

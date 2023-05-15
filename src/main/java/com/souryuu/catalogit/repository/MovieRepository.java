@@ -11,11 +11,6 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     public Movie getMovieByImdbUrlEqualsIgnoreCase(String imdbUrl);
 
-    @Query("SELECT m FROM Movie m " +
-            "JOIN FETCH m.directors " +
-            "JOIN FETCH m.writers " +
-            "JOIN FETCH m.reviews " +
-            "WHERE m.movieID = :id")
-    public Movie getMovieByIdWithAll(@Param("id") long id);
+    public Movie getMovieByMovieID(long id);
 
 }
