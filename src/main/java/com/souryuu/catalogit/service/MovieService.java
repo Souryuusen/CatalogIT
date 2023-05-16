@@ -28,8 +28,38 @@ public class MovieService {
     }
 
     public List<Movie> findAllWithReviews() {
-        List<Movie> movieList = this.repository.findAll();
+        List<Movie> movieList = this.findAll();
         movieList.forEach(movie -> Hibernate.initialize(movie.getReviews()));
+        return movieList;
+    }
+
+    public List<Movie> findAllByTitleContaining(String partTitle) {
+        return this.repository.findAllByTitleContainsIgnoreCase(partTitle);
+    }
+
+    public List<Movie> findAllByTitleContainingWithReviews(String partTitle) {
+        List<Movie> movieList = findAllByTitleContaining(partTitle);
+        movieList.forEach(m -> Hibernate.initialize(m.getReviews()));
+        return movieList;
+    }
+
+    public List<Movie> findAllById(long id) {
+        return this.repository.findAllByMovieIDEquals(id);
+    }
+
+    public List<Movie> findAllByIdWithReviews(long id) {
+        List<Movie> movieList = findAllById(id);
+        movieList.forEach(m -> Hibernate.initialize(m.getReviews()));
+        return movieList;
+    }
+
+    public List<Movie> findAllByUrlContains(String partUrl) {
+        return this.repository.findAllByImdbUrlContainsIgnoreCase(partUrl);
+    }
+
+    public List<Movie> findAllByUrlContainsWithReviews(String partUrl) {
+        List<Movie> movieList = findAllByUrlContains(partUrl);
+        movieList.forEach(m -> Hibernate.initialize(m.getReviews()));
         return movieList;
     }
 

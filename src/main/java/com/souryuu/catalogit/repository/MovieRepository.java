@@ -6,11 +6,16 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    public Movie getMovieByImdbUrlEqualsIgnoreCase(String imdbUrl);
+    Movie getMovieByImdbUrlEqualsIgnoreCase(String imdbUrl);
 
-    public Movie getMovieByMovieID(long id);
+    Movie getMovieByMovieID(long id);
 
+    List<Movie> findAllByMovieIDEquals(long id);
+    List<Movie> findAllByTitleContainsIgnoreCase(String title);
+    List<Movie> findAllByImdbUrlContainsIgnoreCase(String link);
 }

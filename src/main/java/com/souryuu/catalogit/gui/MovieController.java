@@ -9,8 +9,10 @@ import com.souryuu.catalogit.service.MovieService;
 import com.souryuu.catalogit.service.ReviewService;
 import com.souryuu.catalogit.service.WriterService;
 import com.souryuu.catalogit.utility.DialogUtility;
+import com.souryuu.catalogit.utility.ExternalFileParser;
 import com.souryuu.catalogit.utility.FXUtility;
 import com.souryuu.catalogit.utility.ScraperUtility;
+import com.souryuu.imdbscrapper.MovieDataExtractor;
 import com.souryuu.imdbscrapper.entity.MovieData;
 import jakarta.transaction.Transactional;
 import javafx.beans.binding.Bindings;
@@ -27,11 +29,15 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import lombok.SneakyThrows;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -177,10 +183,72 @@ public class MovieController {
      * @author Grzegorz Lach
      * @since v0.0.1
      */
+    @SneakyThrows
     @FXML
     public void onBtnLoadDataAction() {
         //TODO: Add Method Implementation
-        System.out.println(currentMovie);
+        ExternalFileParser efp = new ExternalFileParser();
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Resource File");
+        File f = fileChooser.showOpenDialog(root.getScene().getWindow());
+
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Scanner sc = null;
+                try {
+                    sc = new Scanner(f);
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                while(sc.hasNext()) {
+                    String line = sc.nextLine();
+                    List<String> lineData = efp.parseMovieLine(line);
+
+                    if(lineData.size() != 4) continue;
+
+                    String imdbUrl = lineData.get(2).trim();
+                    MovieData scrapedData = ScraperUtility.scrapeData(imdbUrl);
+                    Movie movieToAdd = new Movie(imdbUrl, scrapedData);
+                    HashSet<Director> directorsToAdd = new HashSet<>();
+                    HashSet<Writer> writersToAdd = new HashSet<>();
+                    for(String directorName : scrapedData.getDirectors()) {
+                        String n = ScraperUtility.formatToCamelCase(directorName);
+                        if(!directorService.existsByNameIgnoreCase(ScraperUtility.formatToCamelCase(directorName))) {
+                            Director d = new Director(n);
+                            directorService.save(d);
+                            directorsToAdd.add(d);
+                        } else {
+                            directorsToAdd.add(directorService.getDirectorByNameEqualsIgnoreCase(n));
+                        }
+                    }
+                    movieToAdd.setDirectors(directorsToAdd);
+                    for(String writerName : scrapedData.getWriters()) {
+                        String n = ScraperUtility.formatToCamelCase(writerName);
+                        if(!writerService.existsByNameIgnoreCase(n)) {
+                            Writer w = new Writer(n);
+                            writerService.save(w);
+                            writersToAdd.add(w);
+                        } else {
+                            writersToAdd.add(writerService.getWriterByNameEqualsIgnoreCase(n));
+                        }
+                    }
+                    movieToAdd.setWriters(writersToAdd);
+                    movieService.save(movieToAdd);
+                    System.out.println(movieToAdd);
+                    // Review
+                    double rating = Double.parseDouble(lineData.get(1).trim());
+                    rating *= 10.0;
+                    Review r = new Review((int)rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
+                    reviewService.save(r);
+                    System.out.println(r);
+                }
+            }
+        });
+        t.start();
+
+
     }
 
     /**
@@ -450,12 +518,14 @@ public class MovieController {
 
     private void refreshDisplayedEditedReview() {
         // Set Fields To Values From Review At Current Index
-        Review review = currentReviews.stream().toList().get(currentReviewIndexProperty.getValue());
-        sliderEditedReviewRating.setValue(review.getRating()/10.0);
-        areaEditedReviewBody.setText(review.getReview());
-        ZonedDateTime currentReviewDate = review.getCreationData();
-        String currentDate = currentReviewDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-        labelEditedReviewCreation.setText(currentDate);
+        if(currentReviews.size() > 0) {
+            Review review = currentReviews.stream().toList().get(currentReviewIndexProperty.getValue());
+            sliderEditedReviewRating.setValue(review.getRating() / 10.0);
+            areaEditedReviewBody.setText(review.getReview());
+            ZonedDateTime currentReviewDate = review.getCreationData();
+            String currentDate = currentReviewDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            labelEditedReviewCreation.setText(currentDate);
+        }
     }
 
     /**

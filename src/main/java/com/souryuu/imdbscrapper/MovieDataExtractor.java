@@ -62,11 +62,19 @@ public class MovieDataExtractor implements Extractable {
      * @return String value that represents full title of production
      */
     private String retrieveTitleData(Document document) {
-        final String TITLE_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[2]/div[1]/h1/span";
+        final String TITLE_ELEMENT_XPATH_ALT = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[2]/div[1]/h1/span";
+        final String TITLE_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[2]/div[1]/div";
         // HTML Element JSOUP Retrieval
         Element titleElement = document.selectXpath(TITLE_ELEMENT_XPATH).first();
+        if(titleElement == null) {
+            titleElement = document.selectXpath(TITLE_ELEMENT_XPATH_ALT).first();
+        }
+        String title = titleElement.ownText();
+        if(title.startsWith("Original title:")) {
+            title = title.replaceFirst("Original title:", "").trim();
+        }
         // Return Value
-        return titleElement.ownText();
+        return title;
     }
 
     /**

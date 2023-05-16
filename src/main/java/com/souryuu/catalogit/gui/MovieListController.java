@@ -4,11 +4,18 @@ import com.souryuu.catalogit.entity.Director;
 import com.souryuu.catalogit.entity.Movie;
 import com.souryuu.catalogit.entity.Review;
 import com.souryuu.catalogit.entity.Writer;
+import com.souryuu.catalogit.entity.enums.SearchCriteriaEnum;
 import com.souryuu.catalogit.service.DirectorService;
 import com.souryuu.catalogit.service.MovieService;
 import com.souryuu.catalogit.service.ReviewService;
 import com.souryuu.catalogit.service.WriterService;
 import com.souryuu.catalogit.utility.FXUtility;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -26,12 +33,23 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 @Component
 @FxmlView("show-all-movies-view.fxml")
 public class MovieListController {
+
+    private static final String BY_ID = "ID Filmu";
+    private static final String BY_TITLE = "Tytuł Filmu";
+    private static final String BY_LINK = "Link Filmu";
+
 
     private final MovieService movieService;
     private final ReviewService reviewService;
@@ -40,11 +58,17 @@ public class MovieListController {
     private final FxWeaver fxWeaver;
 
     private Movie currentMovie;
+    private List<Movie> currentMovieList;
+
+    private Object firstRunInitLock;
 
     @FXML AnchorPane paneDetails;
 
     @FXML Button btnShowMovieDetails;
     @FXML Button btnShowReviewDetails;
+    @FXML Button btnSearch;
+
+    @FXML ComboBox<String> comboSearchBy;
 
     @FXML TextField fieldCurrentMovieID;
     @FXML TextField fieldCurrentMovieTitle;
@@ -53,12 +77,16 @@ public class MovieListController {
     @FXML TextField fieldCurrentMovieLanguage;
     @FXML TextField fieldCurrentMovieReleaseDate;
     @FXML TextField fieldCurrentMovieCountryOfOrigin;
+    @FXML TextField fieldSearch;
+
+    @FXML TextArea areaReviewBody;
 
     @FXML ImageView imageCover;
 
     @FXML TableView tableMovies;
     @FXML TableView tableDirectors;
     @FXML TableView tableWriters;
+    @FXML TableView tableReviews;
 
     @FXML TableColumn columnMovieID;
     @FXML TableColumn columnMovieTitle;
@@ -68,6 +96,11 @@ public class MovieListController {
     @FXML TableColumn columnDirectorName;
     @FXML TableColumn columnWriterID;
     @FXML TableColumn columnWriterName;
+    @FXML TableColumn<Review, Long> columnReviewID;
+    @FXML TableColumn<Review, ZonedDateTime> columnReviewCreation;
+    @FXML TableColumn<Review, Double> columnReviewRating;
+
+
 
     public MovieListController(MovieService movieService, ReviewService reviewService, DirectorService directorService, WriterService writerService, FxWeaver fxWeaver) {
         this.movieService = movieService;
@@ -79,30 +112,100 @@ public class MovieListController {
 
     @FXML
     public void initialize() {
-        fillTableWithMovieData(movieService.findAllWithReviews());
+        if(firstRunInitLock == null) {
+            onBtnRefreshDatabaseAction();
+            firstRunInitLock = new Object();
+        }
+        comboSearchBy.getSelectionModel().select(0);
+        createBindings();
+    }
+
+    private void createBindings() {
+        BooleanProperty currentMovieNullProperty = new SimpleBooleanProperty(currentMovie == null);
+        btnShowMovieDetails.disableProperty().bind(currentMovieNullProperty);
+        btnShowReviewDetails.disableProperty().bind(currentMovieNullProperty);
     }
 
     @FXML
     public void onBtnSearchAction() {
+        if(fieldSearch.getText().trim().equalsIgnoreCase("")) {
+            currentMovieList = movieService.findAllWithReviews();
+            fillTableWithMovieData();
+        } else {
+            String selection = comboSearchBy.getValue();
+            switch (selection) {
+                case BY_ID -> searchByID();
+                case BY_LINK -> searchByLink();
+                case BY_TITLE -> searchByTitle();
+                default -> invalidSearchCriteria();
+            }
+        }
+    }
 
+    private void searchByID() {
+        if(fieldSearch.getText().length() > 0) {
+            String valueString = fieldSearch.getText().trim();
+            try {
+                long idCriteria = Long.parseLong(valueString);
+                currentMovieList = movieService.findAllByIdWithReviews(idCriteria);
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                // TODO: Add alert dialog for wrong id typed in search text field
+            } finally {
+                fillTableWithMovieData();
+            }
+        } else {
+            // TODO: Display alert from invalid value from text field
+        }
+    }
+
+    private void searchByLink() {
+        if(fieldSearch.getText().length() > 0) {
+            String urlCriteria = fieldSearch.getText().trim();
+            currentMovieList = movieService.findAllByUrlContainsWithReviews(urlCriteria);
+            fillTableWithMovieData();
+        } else {
+            // TODO: Display alert from invalid value from text field
+        }
+    }
+
+    private void searchByTitle() {
+        if(fieldSearch.getText().length() > 0) {
+            String titleCriteria = fieldSearch.getText().trim();
+            currentMovieList = movieService.findAllByTitleContainingWithReviews(titleCriteria);
+            fillTableWithMovieData();
+        } else {
+            // TODO: Display alert from invalid value from text field
+        }
+    }
+
+    private void invalidSearchCriteria() {
+        System.out.println(4);
     }
 
     @FXML
     public void onBtnRefreshDatabaseAction() {
-
+        currentMovieList = movieService.findAllWithReviews();
+        fillTableWithMovieData();
     }
 
     @FXML
     public void onBtnShowMovieDetailsAction() {
-        changeDetailsPane(MovieListMovieDetailsController.class);
         if(currentMovie != null) {
+            changeDetailsPane(MovieListMovieDetailsController.class);
             showMovieData(currentMovie);
+        } else {
         }
     }
 
     @FXML
     public void onBtnShowReviewDetailsAction() {
-        changeDetailsPane(MovieListReviewDetailsController.class);
+        if(currentMovie != null && Hibernate.isInitialized(currentMovie.getReviews()) && currentMovie.getReviews().size() > 0){
+            changeDetailsPane(MovieListReviewDetailsController.class);
+            showMovieReviewData(currentMovie);
+        } else {
+            // TODO: Show dialog about empty reviews list
+        }
     }
 
     //TODO: Add errorImage For Situation When Can't Display Proper Cover (blank image or "NO IMG")
@@ -123,25 +226,34 @@ public class MovieListController {
         fillTableWithWriterData(m.getWriters().stream().toList());
     }
 
+    private void showMovieReviewData(Movie m) {
+        fillTableWithReviewData(m.getReviews().stream().toList());
+    }
+
     private void changeDetailsPane(Class controllerClass) {
         paneDetails.getChildren().clear();
         AnchorPane newContent = (AnchorPane) fxWeaver.load(controllerClass).getView().get();
         paneDetails.getChildren().addAll(newContent.getChildren());
     }
 
-    private void fillTableWithMovieData(List<Movie> movieList) {
+    private void fillTableWithMovieData() {
         // Validate Argument
-        if(movieList == null || movieList.size() == 0) throw new IllegalArgumentException("Collection To Display Can't Be Null Or Empty!");
-        // Initialize Table Parameters
-        initializeMoviesTableProperties();
-        tableMovies.getItems().clear();
-        // Converting Movie Objects To MovieDTO Objects
-        ArrayList<MovieDTO> movieDTOArrayList = new ArrayList<>(movieList.size());
-        movieDTOArrayList.addAll(movieList.stream().map(m -> new MovieDTO(m)).toList());
-        //Fill Table With MovieDTO Data
-        tableMovies.setItems(FXCollections.observableList(movieDTOArrayList));
-        tableMovies.getSortOrder().add(columnMovieID);
-        tableMovies.sort();
+        if(currentMovieList == null || currentMovieList.size() == 0) {
+            tableMovies.getItems().clear();
+            paneDetails.getChildren().clear();
+            currentMovie = null;
+        } else {
+            // Initialize Table Parameters
+            initializeMoviesTableProperties();
+            tableMovies.getItems().clear();
+            // Converting Movie Objects To MovieDTO Objects
+            ArrayList<MovieDTO> movieDTOArrayList = new ArrayList<>(currentMovieList.size());
+            movieDTOArrayList.addAll(currentMovieList.stream().map(m -> new MovieDTO(m)).toList());
+            //Fill Table With MovieDTO Data
+            tableMovies.setItems(FXCollections.observableList(movieDTOArrayList));
+            tableMovies.getSortOrder().add(columnMovieID);
+            tableMovies.sort();
+        }
     }
 
     private void initializeMoviesTableProperties() {
@@ -207,7 +319,7 @@ public class MovieListController {
         columnWriterName.setCellValueFactory(new PropertyValueFactory<>("name"));
         // Table Row Clicked Listener
         tableDirectors.setRowFactory(rf -> {
-            TableRow<Director> row = new TableRow<>();
+            TableRow<Writer> row = new TableRow<>();
             row.setOnMouseClicked(mouseEvent -> {
                 // TODO: Implement Functionality To Display Pop-Up With Writer Informations...
             });
@@ -215,6 +327,36 @@ public class MovieListController {
         });
     }
 
+    private void fillTableWithReviewData(List<Review> reviewList) {
+        // Validate Argument
+        if(reviewList == null || reviewList.size() == 0) throw new IllegalArgumentException("Collection To Display Can't Be Null Or Empty!");
+        // Initialize Table Parameters
+        initializeReviewsTableProperties();
+        tableReviews.getItems().clear();
+        // Map Reviews To ReviewDTOs Objects
+        List<ReviewDTO> reviewDTOList = reviewList.stream().map(r -> new ReviewDTO(r)).toList();
+        //Fill Table With MovieDTO Data
+        tableReviews.setItems(FXCollections.observableList(reviewDTOList));
+        tableReviews.getSortOrder().add(columnReviewID);
+        tableReviews.sort();
+    }
+
+    private void initializeReviewsTableProperties() {
+        columnReviewID.setCellValueFactory(new PropertyValueFactory<>("reviewID"));
+        columnReviewID.setSortType(TableColumn.SortType.ASCENDING);
+        columnReviewCreation.setCellValueFactory(new PropertyValueFactory<>("formattedCreationDate"));
+        columnReviewRating.setCellValueFactory(new PropertyValueFactory<>("convertedRating"));
+        // Table Row Clicked Listener
+        tableReviews.setRowFactory(rf -> {
+            TableRow<ReviewDTO> row = new TableRow<>();
+            row.setOnMouseClicked(mouseEvent -> {
+                if (mouseEvent.getClickCount() == 2 && !row.isEmpty()) {
+                    areaReviewBody.setText(row.getItem().getReviewBody());
+                }
+            });
+            return row;
+        });
+    }
 
     @Data
     public class MovieDTO {
@@ -252,5 +394,22 @@ public class MovieListController {
                 }
             }
         }
+    }
+
+    @Data
+    public class ReviewDTO {
+
+        private double convertedRating;
+        private long reviewID;
+        private String formattedCreationDate;
+        private String reviewBody;
+
+        public ReviewDTO(Review review) {
+            setReviewID(review.getReviewID());
+            setConvertedRating(review.getRating()/10.0);
+            setFormattedCreationDate(review.getCreationData().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
+            setReviewBody(review.getReview());
+        }
+
     }
 }

@@ -73,7 +73,7 @@
             </ScrollPane>
             <ScrollPane prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <content>
-                  <TextField fx:id="fieldCurrentMovieCountryOfOrigin" alignment="CENTER" editable="false" prefHeight="26.0" prefWidth="98.0" promptText="Kraj Pochodzenia" />
+                  <TextField fx:id="fieldCurrentMovieCountryOfOrigin" alignment="CENTER" editable="false" prefWidth="98.0" promptText="Kraj Pochodzenia" />
                </content>
             </ScrollPane>
          </children>

@@ -11,6 +11,8 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
 <AnchorPane fx:id="root" prefHeight="570.0" prefWidth="640.0" stylesheets="@movie-view.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MovieListController">
    <children>
       <ScrollPane fx:id="scrollContent" hbarPolicy="NEVER" layoutX="14.0" layoutY="14.0" prefHeight="200.0" prefWidth="620.0" AnchorPane.bottomAnchor="250.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
@@ -43,6 +45,13 @@
                </HBox.margin>
             </Label>
             <ComboBox fx:id="comboSearchBy" prefWidth="150.0">
+               <items>
+                  <FXCollections fx:factory="observableArrayList">
+                     <String fx:value="ID Filmu"/>
+                     <String fx:value="Tytuł Filmu"/>
+                     <String fx:value="Link Filmu"/>
+                  </FXCollections>
+               </items>
                <HBox.margin>
                   <Insets left="5.0" right="5.0" />
                </HBox.margin>
