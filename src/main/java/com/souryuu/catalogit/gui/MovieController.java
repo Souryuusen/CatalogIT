@@ -15,6 +15,7 @@ import com.souryuu.catalogit.utility.ScraperUtility;
 import com.souryuu.imdbscrapper.MovieDataExtractor;
 import com.souryuu.imdbscrapper.entity.MovieData;
 import jakarta.transaction.Transactional;
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -36,13 +37,11 @@ import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
 import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 import java.util.stream.Collectors;
 
@@ -61,6 +60,8 @@ public class MovieController {
     private Movie currentMovie;
     private HashSet<Review> currentReviews = new HashSet<>();
     private IntegerProperty currentReviewIndexProperty = new SimpleIntegerProperty(0);
+
+    private Thread loadingThread;
 
     //##################################################################################################################
     @FXML AnchorPane root;
@@ -147,7 +148,7 @@ public class MovieController {
      */
     @FXML
     public void onBtnScrapeDataAction() {
-        if(textImdbLink.getText().trim().length() > 0) {
+        if(textImdbLink.getText().trim().length() > 0 && (loadingThread != null && !loadingThread.isAlive() || loadingThread == null)) {
             String movieImdbLink = textImdbLink.getText().trim().toLowerCase();
             // Clear Detail Pane
             detailPane.getChildren().clear();
@@ -172,11 +173,19 @@ public class MovieController {
             textReleaseDate.setText(currentMovie.getReleaseDate());
             textCountryOfOrigin.setText(currentMovie.getCountryOfOrigin());
             textLanguage.setText(currentMovie.getLanguage());
-//            displayMovieCover(currentMovie.getCoverUrl());
             FXUtility.changeImageViewContent(viewCoverImage, currentMovie.getCoverUrl(), null);
             currentMovie.setWriters(obtainCurrentWriters());
             currentMovie.setDirectors(obtainCurrentDirectors());
         }
+    }
+
+    private void displayMovieData(Movie movie){
+        textTitle.setText(movie.getTitle());
+        textCoverUrl.setText(movie.getCoverUrl());
+        textRuntime.setText(movie.getRuntime());
+        textReleaseDate.setText(movie.getReleaseDate());
+        textCountryOfOrigin.setText(movie.getCountryOfOrigin());
+        textLanguage.setText(movie.getLanguage());
     }
 
     /**
@@ -193,62 +202,79 @@ public class MovieController {
         fileChooser.setTitle("Open Resource File");
         File f = fileChooser.showOpenDialog(root.getScene().getWindow());
 
-        Thread t = new Thread(new Runnable() {
+        loadingThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                Scanner sc = null;
-                try {
-                    sc = new Scanner(f);
-                } catch (FileNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-                while(sc.hasNext()) {
-                    String line = sc.nextLine();
-                    List<String> lineData = efp.parseMovieLine(line);
+                btnLoadData.setDisable(true);
+                try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(f), "UTF-8"))) {
+                    for (String line : br.lines().toList()) {
+                        List<String> lineData = efp.parseMovieLine(line);
 
-                    if(lineData.size() != 4) continue;
+                        if (lineData.size() != 4) continue;
 
-                    String imdbUrl = lineData.get(2).trim();
-                    MovieData scrapedData = ScraperUtility.scrapeData(imdbUrl);
-                    Movie movieToAdd = new Movie(imdbUrl, scrapedData);
-                    HashSet<Director> directorsToAdd = new HashSet<>();
-                    HashSet<Writer> writersToAdd = new HashSet<>();
-                    for(String directorName : scrapedData.getDirectors()) {
-                        String n = ScraperUtility.formatToCamelCase(directorName);
-                        if(!directorService.existsByNameIgnoreCase(ScraperUtility.formatToCamelCase(directorName))) {
-                            Director d = new Director(n);
-                            directorService.save(d);
-                            directorsToAdd.add(d);
+                        String imdbUrl = lineData.get(2).trim();
+                        if (movieService.getMovieByImdbUrl(imdbUrl) == null) {
+                            MovieData scrapedData = ScraperUtility.scrapeData(imdbUrl);
+                            Movie movieToAdd = new Movie(imdbUrl, scrapedData);
+                            HashSet<Director> directorsToAdd = new HashSet<>();
+                            HashSet<Writer> writersToAdd = new HashSet<>();
+                            for (String directorName : scrapedData.getDirectors()) {
+                                String n = ScraperUtility.formatToCamelCase(directorName);
+                                if (!directorService.existsByNameIgnoreCase(ScraperUtility.formatToCamelCase(directorName))) {
+                                    Director d = new Director(n);
+                                    directorService.save(d);
+                                    directorsToAdd.add(d);
+                                } else {
+                                    directorsToAdd.add(directorService.getDirectorByNameEqualsIgnoreCase(n));
+                                }
+                            }
+                            movieToAdd.setDirectors(directorsToAdd);
+                            for (String writerName : scrapedData.getWriters()) {
+                                String n = ScraperUtility.formatToCamelCase(writerName);
+                                if (!writerService.existsByNameIgnoreCase(n)) {
+                                    Writer w = new Writer(n);
+                                    writerService.save(w);
+                                    writersToAdd.add(w);
+                                } else {
+                                    writersToAdd.add(writerService.getWriterByNameEqualsIgnoreCase(n));
+                                }
+                            }
+                            movieToAdd.setWriters(writersToAdd);
+                            movieService.save(movieToAdd);
+                            System.out.println(movieToAdd);
+                            // Review
+                            double rating = Double.parseDouble(lineData.get(1).trim());
+                            rating *= 10.0;
+                            Review r = new Review((int) rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
+                            reviewService.save(r);
+                            System.out.println(r);
+                            Platform.runLater(new Runnable() {
+                                @Override public void run() {
+                                    textImdbLink.setText(movieToAdd.getImdbUrl());
+                                    textTitle.setText(movieToAdd.getTitle());
+                                    textLanguage.setText(movieToAdd.getLanguage());
+                                    textCoverUrl.setText(movieToAdd.getCoverUrl());
+                                    textRuntime.setText(movieToAdd.getRuntime());
+                                    textCountryOfOrigin.setText(movieToAdd.getCountryOfOrigin());
+                                    textReleaseDate.setText(movieToAdd.getReleaseDate());
+                                    addDirectors(movieToAdd.getDirectors().stream().map(d -> d.getName()).toList());
+                                    addWriters(movieToAdd.getWriters().stream().map(w -> w.getName()).toList());
+                                    FXUtility.changeImageViewContent(viewCoverImage, movieToAdd.getCoverUrl(), null);
+                                }
+                            });
                         } else {
-                            directorsToAdd.add(directorService.getDirectorByNameEqualsIgnoreCase(n));
+                            // TODO: Add logic for movie for read already existing in db...
                         }
+                        System.out.println("Movie With Link:\t" +  imdbUrl + " Already Exists In Database!");
                     }
-                    movieToAdd.setDirectors(directorsToAdd);
-                    for(String writerName : scrapedData.getWriters()) {
-                        String n = ScraperUtility.formatToCamelCase(writerName);
-                        if(!writerService.existsByNameIgnoreCase(n)) {
-                            Writer w = new Writer(n);
-                            writerService.save(w);
-                            writersToAdd.add(w);
-                        } else {
-                            writersToAdd.add(writerService.getWriterByNameEqualsIgnoreCase(n));
-                        }
-                    }
-                    movieToAdd.setWriters(writersToAdd);
-                    movieService.save(movieToAdd);
-                    System.out.println(movieToAdd);
-                    // Review
-                    double rating = Double.parseDouble(lineData.get(1).trim());
-                    rating *= 10.0;
-                    Review r = new Review((int)rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
-                    reviewService.save(r);
-                    System.out.println(r);
+                } catch (IOException ex) {
+                    // TODO: Add exception handling...
+                } finally {
+                    btnLoadData.setDisable(false);
                 }
             }
         });
-        t.start();
-
-
+        loadingThread.start();
     }
 
     /**
@@ -261,6 +287,7 @@ public class MovieController {
         if(currentMovie != null && currentMovie.getImdbUrl() != null && currentMovie.getImdbUrl().length() > 0) {
             currentMovie.setDirectors(obtainCurrentDirectors());
             currentMovie.setWriters(obtainCurrentWriters());
+            movieService.save(currentMovie);
             currentMovie.setReviews(obtainCurrentReviews());
             movieService.save(currentMovie);
         }

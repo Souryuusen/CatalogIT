@@ -300,7 +300,10 @@ public class MovieDataExtractor implements Extractable {
     private String formatToCamelCase(String input) {
         return Arrays.asList(input.split(" "))
                 .stream().map(s -> s.toLowerCase())
-                .map(s -> s.replaceFirst(s.substring(0,1), s.substring(0,1).toUpperCase()))
-                .collect(Collectors.joining(" "));
+                .map(s -> {
+                    String tmp = s.replaceAll("\\W", "");
+                    String tmp2 = tmp.replaceFirst(tmp.substring(0,1), tmp.substring(0,1).toUpperCase());
+                    return s.replace(tmp, tmp2);
+                }).collect(Collectors.joining(" "));
     }
 }
