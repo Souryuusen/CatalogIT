@@ -148,6 +148,7 @@ public class MovieController {
      */
     @FXML
     public void onBtnScrapeDataAction() {
+
         if(textImdbLink.getText().trim().length() > 0 && (loadingThread != null && !loadingThread.isAlive() || loadingThread == null)) {
             String movieImdbLink = textImdbLink.getText().trim().toLowerCase();
             // Clear Detail Pane
