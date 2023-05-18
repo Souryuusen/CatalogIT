@@ -10,12 +10,23 @@ import java.net.URL;
 
 public class FXUtility {
 
-    public static void changeImageViewContent(ImageView view, String url, BufferedImage errorImage) {
+    public static void changeImageViewContent(ImageView view, String url, boolean useErrorImage) {
         try {
             BufferedImage image = ImageIO.read(new URL(url));
             view.setImage(SwingFXUtils.toFXImage(image, null));
         } catch (IOException ex) {
-            view.setImage(SwingFXUtils.toFXImage(errorImage, null));
+            if(useErrorImage) {
+                BufferedImage errorImage;
+                try {
+                    URL errorImageURL = FXUtility.class.getResource("/static/images/NO_IMG.png");
+                    if(errorImageURL != null) {
+                        errorImage = ImageIO.read(errorImageURL);
+                        view.setImage(SwingFXUtils.toFXImage(errorImage, null));
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         view.setPreserveRatio(true);
     }

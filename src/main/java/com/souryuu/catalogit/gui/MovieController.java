@@ -171,7 +171,7 @@ public class MovieController {
             textReleaseDate.setText(currentMovie.getReleaseDate());
             textCountryOfOrigin.setText(currentMovie.getCountryOfOrigin());
             textLanguage.setText(currentMovie.getLanguage());
-            FXUtility.changeImageViewContent(viewCoverImage, currentMovie.getCoverUrl(), null);
+            FXUtility.changeImageViewContent(viewCoverImage, currentMovie.getCoverUrl(), true);
             currentMovie.setWriters(obtainCurrentWriters());
             currentMovie.setDirectors(obtainCurrentDirectors());
         }
@@ -246,7 +246,7 @@ public class MovieController {
                                 textReleaseDate.setText(movieToAdd.getReleaseDate());
                                 addDirectors(movieToAdd.getDirectors().stream().map(Director::getName).toList());
                                 addWriters(movieToAdd.getWriters().stream().map(Writer::getName).toList());
-                                FXUtility.changeImageViewContent(viewCoverImage, movieToAdd.getCoverUrl(), null);
+                                FXUtility.changeImageViewContent(viewCoverImage, movieToAdd.getCoverUrl(), true);
                             });
                         } else {
                             // TODO: Add logic for movie for read already existing in db...
