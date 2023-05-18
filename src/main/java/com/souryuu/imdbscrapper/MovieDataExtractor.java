@@ -1,5 +1,6 @@
 package com.souryuu.imdbscrapper;
 
+import com.souryuu.catalogit.exception.NoElementSelectedFromPageException;
 import com.souryuu.imdbscrapper.entity.MovieData;
 import com.souryuu.imdbscrapper.entity.ProductionDetailKeys;
 import com.souryuu.imdbscrapper.exceptions.NoDocumentPresentException;
@@ -18,7 +19,7 @@ public class MovieDataExtractor implements Extractable {
 
     private Document content;
 
-    private String contentURL = "";
+    private String contentURL;
 
     public MovieDataExtractor(String url) {
         this.contentURL = url;
@@ -46,7 +47,7 @@ public class MovieDataExtractor implements Extractable {
     public MovieData extract() {
         Optional<Document> retrievedDocument = PageContentRetriever.retrievePageContent(getContentURL());
         // Verification Of Retrieved Document
-        if(!retrievedDocument.isPresent())
+        if(retrievedDocument.isEmpty())
             throw new NoDocumentPresentException("No Document Created From Parsing " + getContentURL() + " URL.");
         content=retrievedDocument.get();
         // Start Of Retrieval (Scrapping) Process
@@ -69,18 +70,22 @@ public class MovieDataExtractor implements Extractable {
         if(titleElement == null) {
             titleElement = document.selectXpath(TITLE_ELEMENT_XPATH_ALT).first();
         }
-        String title = titleElement.ownText();
-        if(title.startsWith("Original title:")) {
-            title = title.replaceFirst("Original title:", "").trim();
+        if(titleElement != null) {
+            String title = titleElement.ownText();
+            if (title.startsWith("Original title:")) {
+                title = title.replaceFirst("Original title:", "").trim();
+            }
+            // Return Value
+            return title;
+        } else {
+            throw new NoElementSelectedFromPageException("Error Finding Element Containing Movie Title");
         }
-        // Return Value
-        return title;
     }
 
     /**
      * @author Grzegorz Lach
      * @param document JSOUP Document containing html page from IMDB url link
-     * @return List of persons mentioned on directors part of IMDB HTML page content
+     * @return Set of persons mentioned on directors part of IMDB HTML page content
      */
     private Set<String> retrieveDirectors(Document document) {
         final String DIRECTORS_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[3]/div[2]/div[1]/section/div[2]/div/ul/li[1]/div/ul/li/a";
@@ -97,7 +102,7 @@ public class MovieDataExtractor implements Extractable {
     /**
      * @author Grzegorz Lach
      * @param document JSOUP Document containing html page from IMDB url link
-     * @return List of persons mentioned on writers part of IMDB HTML page content
+     * @return Set of persons mentioned on writers part of IMDB HTML page content
      */
     private Set<String> retrieveWriters(Document document) {
         final String WRITERS_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[3]/div[2]/div[1]/section/div[2]/div/ul/li[2]/div/ul/li/a";
@@ -142,21 +147,25 @@ public class MovieDataExtractor implements Extractable {
 
         Element coverElement = document.selectXpath(MAIN_PAGE_COVER_ELEMENT_XPATH).first();
 
-        String coverURL = coverElement.attr("abs:href");
-        Optional<Document> coverDocumentOptional = PageContentRetriever.retrievePageContent(coverURL);
-        if(coverDocumentOptional.isPresent()) {
-            Document coverDocument = coverDocumentOptional.get();
-            Elements coverElements = coverDocument.selectXpath(COVER_ELEMENT_XPATH);
-            for(Element e : coverElements) {
-                if(e.attr("data-image-id").endsWith("-curr")) {
-                    coverElement = e;
-                    break;
+        if(coverElement != null) {
+            String coverURL = coverElement.attr("abs:href");
+            Optional<Document> coverDocumentOptional = PageContentRetriever.retrievePageContent(coverURL);
+            if (coverDocumentOptional.isPresent()) {
+                Document coverDocument = coverDocumentOptional.get();
+                Elements coverElements = coverDocument.selectXpath(COVER_ELEMENT_XPATH);
+                for (Element e : coverElements) {
+                    if (e.attr("data-image-id").endsWith("-curr")) {
+                        coverElement = e;
+                        break;
+                    }
                 }
+                String retrievedURL = coverElement.attr("src");
+                optionalCoverURL = Optional.of(retrievedURL);
             }
-            String retrievedURL = coverElement.attr("src");
-            optionalCoverURL = Optional.of(retrievedURL);
+            return optionalCoverURL;
+        } else {
+            throw new NoElementSelectedFromPageException("Error Finding Element Containing Movie Cover");
         }
-        return optionalCoverURL;
     }
 
     /**
@@ -203,35 +212,41 @@ public class MovieDataExtractor implements Extractable {
         if(releaseDocumentOptional.isPresent()) {
             Element releaseDateCountryElement = releaseDocumentOptional.get().selectXpath(RELEASE_DATE_COUNTRY_XPATH).first();
             Element releaseDateElement = releaseDocumentOptional.get().selectXpath(RELEASE_DATE_XPATH).first();
-            String productionDate = releaseDateCountryElement.ownText() + ", " + releaseDateElement.ownText();
-            productionDetailMap.put(ProductionDetailKeys.RELEASE_DATE, formatToCamelCase(productionDate));
+            if(releaseDateElement != null && releaseDateCountryElement != null) {
+                String productionDate = releaseDateCountryElement.ownText() + ", " + releaseDateElement.ownText();
+                productionDetailMap.put(ProductionDetailKeys.RELEASE_DATE, formatToCamelCase(productionDate));
+            } else {
+                String errorBody;
+                if(releaseDateElement == null && releaseDateCountryElement != null) {
+                    errorBody = "Error Finding Release Date Element!!";
+                } else if (releaseDateElement != null) {
+                    errorBody = "Error Finding Release Date Country Element!!";
+                } else {
+                    errorBody = "Error Finding Release Date And Country Elements!!";
+                }
+                throw new NoElementSelectedFromPageException(errorBody);
+            }
         }
         // Production Country Of Origin Selection
         Elements countryOfOriginElements = document.select(COUNTY_OF_ORIGIN_SELECTOR);
-        if(countryOfOriginElements != null) {
-            String countries = "";
-            for(Element e : countryOfOriginElements) {
-                if(!countries.equalsIgnoreCase("")) {
-                    countries += ", ";
-                }
-                countries += formatToCamelCase(e.ownText());
-            }
-            productionDetailMap.put(ProductionDetailKeys.COUNTRY_OF_ORIGIN, countries);
-        }
+        productionDetailMap.put(ProductionDetailKeys.COUNTRY_OF_ORIGIN, buildStringFromElementsText(countryOfOriginElements));
         // Production Language Selection
         Elements languageElements = document.select(LANGUAGE_SELECTOR);
-        if(languageElements != null) {
-            String langs = "";
-            for(Element e : languageElements) {
-                if(!langs.equalsIgnoreCase("")) {
-                    langs += ", ";
-                }
-                langs += formatToCamelCase(e.ownText());
-            }
-            productionDetailMap.put(ProductionDetailKeys.LANGUAGE, langs);
-        }
+        productionDetailMap.put(ProductionDetailKeys.LANGUAGE, buildStringFromElementsText(languageElements));
+
         resultOptional = Optional.of(productionDetailMap);
         return resultOptional;
+    }
+
+    private String buildStringFromElementsText(Elements elements) {
+        StringBuilder sb = new StringBuilder();
+        for(Element e : elements) {
+            if(sb.length() == 0) {
+                sb.append(", ");
+            }
+            sb.append(formatToCamelCase(e.ownText()));
+        }
+        return sb.toString();
     }
 
     /**
@@ -248,7 +263,11 @@ public class MovieDataExtractor implements Extractable {
         Optional<Document> technicalDocument = PageContentRetriever.retrievePageContent(document.baseUri() + TECHNICAL_EXTENSION);
         if(technicalDocument.isPresent()) {
             Element test = technicalDocument.get().selectXpath(RUNTIME_XPATH).first();
-            runtimeOptional = Optional.of(test.ownText());
+            if(test != null) {
+                runtimeOptional = Optional.of(test.ownText());
+            } else {
+                runtimeOptional = Optional.empty();
+            }
         }
         return runtimeOptional;
     }
@@ -289,21 +308,25 @@ public class MovieDataExtractor implements Extractable {
         for(String s : genres) {
             retrievedData.addGenre(s);
         }
-        if (coverURL.isPresent()) retrievedData.setCoverURL(coverURL.get());
-        if (tagListOptional.isPresent()) tagListOptional.get().forEach(t -> retrievedData.addTag(t));
-        if (productionDetailsOptional.isPresent()) retrievedData.setProductionDetails(productionDetailsOptional.get());
-        if (runtimeOptional.isPresent()) retrievedData.setRuntime(runtimeOptional.get());
+        coverURL.ifPresent(s -> retrievedData.setCoverURL(s));
+        tagListOptional.ifPresent(strings -> strings.forEach(t -> retrievedData.addTag(t)));
+        productionDetailsOptional.ifPresent(productionDetailKeysStringMap -> retrievedData.setProductionDetails(productionDetailKeysStringMap));
+        runtimeOptional.ifPresent(s -> retrievedData.setRuntime(s));
         // Return
         return retrievedData;
     }
 
-    private String formatToCamelCase(String input) {
-        return Arrays.asList(input.split(" "))
-                .stream().map(s -> s.toLowerCase())
+    public static String formatToCamelCase(String input) {
+        return Arrays.stream(input.split(" "))
+                .map(String::toLowerCase)
                 .map(s -> {
                     String tmp = s.replaceAll("\\W", "");
-                    String tmp2 = tmp.replaceFirst(tmp.substring(0,1), tmp.substring(0,1).toUpperCase());
-                    return s.replace(tmp, tmp2);
+                    if(tmp.length() > 1) {
+                        String tmp2 = tmp.replaceFirst(tmp.substring(0, 1), tmp.substring(0, 1).toUpperCase());
+                        return s.replace(tmp, tmp2);
+                    } else {
+                        return s;
+                    }
                 }).collect(Collectors.joining(" "));
     }
 }

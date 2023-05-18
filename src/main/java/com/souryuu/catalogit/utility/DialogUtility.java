@@ -17,4 +17,12 @@ public class DialogUtility {
         return alert.showAndWait();
     }
 
+    public static void createErrorDialog(String title, String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.getButtonTypes().clear();
+        alert.setTitle(title);
+        alert.setContentText(msg);
+        alert.getButtonTypes().add(new ButtonType("OK"));
+    }
+
 }
