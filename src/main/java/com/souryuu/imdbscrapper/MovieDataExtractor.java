@@ -49,7 +49,7 @@ public class MovieDataExtractor implements Extractable {
         // Verification Of Retrieved Document
         if(retrievedDocument.isEmpty())
             throw new NoDocumentPresentException("No Document Created From Parsing " + getContentURL() + " URL.");
-        content=retrievedDocument.get();
+        content = retrievedDocument.get();
         // Start Of Retrieval (Scrapping) Process
         extractData(getContent());
 
@@ -88,15 +88,14 @@ public class MovieDataExtractor implements Extractable {
      * @return Set of persons mentioned on directors part of IMDB HTML page content
      */
     private Set<String> retrieveDirectors(Document document) {
-        final String DIRECTORS_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[3]/div[2]/div[1]/section/div[2]/div/ul/li[1]/div/ul/li/a";
-
-        Set<String> directorSet = new HashSet<>();
-        Elements elements = document.selectXpath(DIRECTORS_ELEMENT_XPATH);
-        for(Element e : elements) {
-            // TODO: Extend person information about director (age, production count etc...)
-            directorSet.add(e.ownText());
-        }
-        return directorSet;
+        // Selection Of a elements contained in div/ul/li that is direct sibling to element containing text "Director" which is contained inside ul/li with role attribute equals to "presentation"
+        final String DIRECTORS_SELECTOR = "ul li[role=presentation] :contains(Director) + div ul li a";
+        // Retrieval Of Elements
+        Elements elements = document.select(DIRECTORS_SELECTOR);
+        // Parsing DISTINCT Director Names Formatted To CamelCase From Obtained Elements
+        List<String> parsedDirectorsList = elements.eachText().stream().map(MovieDataExtractor::formatToCamelCase).distinct().toList();
+        // TODO: Extend person information about director (age, production count etc...)
+        return new HashSet<>(parsedDirectorsList);
     }
 
     /**
@@ -105,15 +104,10 @@ public class MovieDataExtractor implements Extractable {
      * @return Set of persons mentioned on writers part of IMDB HTML page content
      */
     private Set<String> retrieveWriters(Document document) {
-        final String WRITERS_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[3]/div[2]/div[1]/section/div[2]/div/ul/li[2]/div/ul/li/a";
-
-        Set<String> writerSet = new HashSet<>();
-        Elements elements = document.selectXpath(WRITERS_ELEMENT_XPATH);
-        for(Element e : elements) {
-            // TODO: Extend person information about writer (age, production count etc...)
-            writerSet.add(e.ownText());
-        }
-        return writerSet;
+        final String WRITERS_SELECTOR = "ul li[role=presentation] :contains(Writer) + div ul li a";
+        List<String> parsedWriterList = document.select(WRITERS_SELECTOR).eachText().stream().map(MovieDataExtractor::formatToCamelCase).distinct().toList();
+        // TODO: Extend person information about writer (age, production count etc...)
+        return new HashSet<>(parsedWriterList);
     }
 
     /**
@@ -164,7 +158,9 @@ public class MovieDataExtractor implements Extractable {
             }
             return optionalCoverURL;
         } else {
-            throw new NoElementSelectedFromPageException("Error Finding Element Containing Movie Cover");
+            //throw new NoElementSelectedFromPageException("Error Finding Element Containing Movie Cover");
+            optionalCoverURL = Optional.empty();
+            return optionalCoverURL;
         }
     }
 
@@ -241,7 +237,7 @@ public class MovieDataExtractor implements Extractable {
     private String buildStringFromElementsText(Elements elements) {
         StringBuilder sb = new StringBuilder();
         for(Element e : elements) {
-            if(sb.length() == 0) {
+            if(sb.length() != 0) {
                 sb.append(", ");
             }
             sb.append(formatToCamelCase(e.ownText()));
