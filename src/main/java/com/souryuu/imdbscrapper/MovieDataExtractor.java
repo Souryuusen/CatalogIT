@@ -212,15 +212,7 @@ public class MovieDataExtractor implements Extractable {
                 String productionDate = releaseDateCountryElement.ownText() + ", " + releaseDateElement.ownText();
                 productionDetailMap.put(ProductionDetailKeys.RELEASE_DATE, formatToCamelCase(productionDate));
             } else {
-                String errorBody;
-                if(releaseDateElement == null && releaseDateCountryElement != null) {
-                    errorBody = "Error Finding Release Date Element!!";
-                } else if (releaseDateElement != null) {
-                    errorBody = "Error Finding Release Date Country Element!!";
-                } else {
-                    errorBody = "Error Finding Release Date And Country Elements!!";
-                }
-                throw new NoElementSelectedFromPageException(errorBody);
+                productionDetailMap.put(ProductionDetailKeys.RELEASE_DATE, "");
             }
         }
         // Production Country Of Origin Selection
@@ -235,14 +227,18 @@ public class MovieDataExtractor implements Extractable {
     }
 
     private String buildStringFromElementsText(Elements elements) {
-        StringBuilder sb = new StringBuilder();
-        for(Element e : elements) {
-            if(sb.length() != 0) {
-                sb.append(", ");
+        if(elements != null) {
+            StringBuilder sb = new StringBuilder();
+            for (Element e : elements) {
+                if (sb.length() != 0) {
+                    sb.append(", ");
+                }
+                sb.append(formatToCamelCase(e.ownText()));
             }
-            sb.append(formatToCamelCase(e.ownText()));
+            return sb.toString();
+        } else {
+            return "";
         }
-        return sb.toString();
     }
 
     /**
