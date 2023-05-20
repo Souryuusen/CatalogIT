@@ -11,6 +11,12 @@ TextField{
     -fx-border-width: 2px;
 }
 
+.table-row-cell:empty:odd, .table-row-cell:empty:even {
+    -fx-background-color: transparent;
+    -fx-border-style: none;
+    -fx-border-color: transparent;
+}
+
 .table-row-cell {
     -fx-border-color: GRAY;
     -fx-border-radius: 2px;
@@ -27,6 +33,13 @@ TextField{
 .table-cell {
     -fx-border-color: LIGHTGRAY;
     -fx-border-radius: 2px;
+    -fx-text-alignment: CENTER;
+    -fx-alignment: CENTER;
+}
+
+.table-cell:empty {
+    -fx-border-color: transparent;
+    -fx-border-style: none;
 }
 
 .button:hover {

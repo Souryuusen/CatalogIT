@@ -52,7 +52,6 @@ public class MovieDataExtractor implements Extractable {
         content = retrievedDocument.get();
         // Start Of Retrieval (Scrapping) Process
         extractData(getContent());
-
         return retrievedData;
     }
 
@@ -134,6 +133,7 @@ public class MovieDataExtractor implements Extractable {
      * @return Optional URL link of IMDB page production cover
      */
     private Optional<String> retrieveProductionCoverURL(Document document) {
+        long start = System.currentTimeMillis();
         final String MAIN_PAGE_COVER_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div/section[1]/section/div[3]/section/section/div[3]/div[1]/div[1]/div/a";
         final String COVER_ELEMENT_XPATH = "//*[@id=\"__next\"]/main/div[2]/div[3]/div/img";
 
@@ -156,6 +156,8 @@ public class MovieDataExtractor implements Extractable {
                 String retrievedURL = coverElement.attr("src");
                 optionalCoverURL = Optional.of(retrievedURL);
             }
+            long end = System.currentTimeMillis();
+            System.out.println("GetCover Duration:\t" + ((end-start)/1000.0));
             return optionalCoverURL;
         } else {
             //throw new NoElementSelectedFromPageException("Error Finding Element Containing Movie Cover");
@@ -171,6 +173,7 @@ public class MovieDataExtractor implements Extractable {
      * @return List of all tags from given production on IMDB url link
      */
     private Optional<List<String>> retrieveAllTags(Document document) {
+        long start = System.currentTimeMillis();
         final String TAGS_URL_EXTENSION = "keywords";
         final String TAGS_ELEMENTS_XPATH = "//*[@id=\"keywords_content\"]/table/tbody/tr/td[1]/div[1]/a | //*[@id=\"keywords_content\"]/table/tbody/tr/td[2]/div[1]/a";
         Optional<List<String>> resultOptional = Optional.empty();
@@ -185,6 +188,8 @@ public class MovieDataExtractor implements Extractable {
             }
             resultOptional = Optional.of(tagList);
         }
+        long end = System.currentTimeMillis();
+        System.out.println("GetTags Duration:\t" + ((end-start)/1000.0));
         return resultOptional;
     }
 
@@ -195,6 +200,7 @@ public class MovieDataExtractor implements Extractable {
      * @return Map of production deteail (Release Date, Country Of Origin, Language) for provided IMDB url document
      */
     private Optional<Map<ProductionDetailKeys, String>> retrieveProductionDetails(Document document) {
+        long start = System.currentTimeMillis();
         final String RELEASE_DATE_EXTENSION = "releaseinfo";
         final String RELEASE_DATE_COUNTRY_XPATH = "//*[@id=\"__next\"]/main/div/section/div/section/div/div[1]/section[1]/div[2]/ul/li/a[1]";
         final String RELEASE_DATE_XPATH = "//*[@id=\"__next\"]/main/div/section/div/section/div/div[1]/section[1]/div[2]/ul/li/div/ul/li/span";
@@ -223,6 +229,8 @@ public class MovieDataExtractor implements Extractable {
         productionDetailMap.put(ProductionDetailKeys.LANGUAGE, buildStringFromElementsText(languageElements));
 
         resultOptional = Optional.of(productionDetailMap);
+        long end = System.currentTimeMillis();
+        System.out.println("GetProductionDetails Duration:\t" + ((end-start)/1000.0));
         return resultOptional;
     }
 
@@ -248,6 +256,7 @@ public class MovieDataExtractor implements Extractable {
      * @return Map of production deteail (Release Date, Country Of Origin, Language) for provided IMDB url document
      */
     private Optional<String> retrieveRunTime(Document document) {
+        long start = System.currentTimeMillis();
         final String TECHNICAL_EXTENSION = "technical";
         final String RUNTIME_XPATH = "//*[@id=\"__next\"]/main/div/section/div/section/div/div[1]/section[1]/div/ul/li[1]/div/ul/li/span[1]";
         Optional<String> runtimeOptional = Optional.empty();
@@ -261,6 +270,8 @@ public class MovieDataExtractor implements Extractable {
                 runtimeOptional = Optional.empty();
             }
         }
+        long end = System.currentTimeMillis();
+        System.out.println("GetRuntime Duration:\t" + ((end-start)/1000.0));
         return runtimeOptional;
     }
 

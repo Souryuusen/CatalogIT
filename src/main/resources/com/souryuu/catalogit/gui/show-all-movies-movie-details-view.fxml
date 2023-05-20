@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
@@ -12,81 +11,84 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="210.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane prefHeight="310.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.souryuu.catalogit.gui.MovieListController">
-    <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxWidth="200.0" minWidth="200.0" prefHeight="190.0"
+    <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" maxWidth="200.0" minWidth="200.0" prefHeight="290.0"
           prefWidth="200.0" style="-fx-background-color: white; -fx-border-width: 1px; -fx-border-style: solid;"
           AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="430.0"
           AnchorPane.topAnchor="10.0">
-        <ImageView fx:id="imageCover" fitHeight="190.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"
+        <ImageView fx:id="imageCover" fitHeight="290.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"
                    HBox.hgrow="NEVER"/>
     </HBox>
-    <StackPane layoutX="430.0" layoutY="9.199999809265137" AnchorPane.bottomAnchor="110.0" AnchorPane.rightAnchor="10.0"
-               AnchorPane.topAnchor="10.0">
-          <TableView fx:id="tableDirectors" prefHeight="200.0" prefWidth="200.0" StackPane.alignment="CENTER">
-              <columns>
-                  <TableColumn fx:id="columnDirectorID" maxWidth="50.0" minWidth="50.0" prefWidth="50.0"
-                               resizable="false" text="#"/>
-                  <TableColumn fx:id="columnDirectorName" editable="false" maxWidth="135.0" minWidth="135.0"
-                               prefWidth="135.0" resizable="false" text="Reżyser"/>
-              </columns>
-          </TableView>
+    <StackPane layoutX="220.0" layoutY="47.0" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="220.0"
+               AnchorPane.rightAnchor="220.0" AnchorPane.topAnchor="45.0">
+        <TableView fx:id="tableDirectors" prefHeight="120.0" prefWidth="200.0" StackPane.alignment="CENTER">
+            <columns>
+                <TableColumn fx:id="columnDirectorID" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" resizable="false"
+                             text="#"/>
+                <TableColumn fx:id="columnDirectorName" editable="false" maxWidth="143.0" minWidth="143.0"
+                             prefWidth="143.0" resizable="false" text="Reżyser"/>
+            </columns>
+        </TableView>
     </StackPane>
-    <StackPane layoutX="430.0" layoutY="109.19999694824219" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0"
-               AnchorPane.topAnchor="110.0">
-          <TableView fx:id="tableWriters" prefHeight="200.0" prefWidth="200.0">
-              <columns>
-                  <TableColumn fx:id="columnWriterID" maxWidth="50.0" minWidth="50.0" prefWidth="50.0"
-                               resizable="false" text="#"/>
-                  <TableColumn fx:id="columnWriterName" editable="false" maxWidth="135.0" minWidth="135.0"
-                               prefWidth="135.0" resizable="false" text="Scenarzysta"/>
-              </columns>
-          </TableView>
+    <StackPane layoutX="426.0" layoutY="45.0" AnchorPane.bottomAnchor="175.0" AnchorPane.leftAnchor="430.0"
+               AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="45.0">
+        <TableView fx:id="tableWriters" prefHeight="120.0" prefWidth="200.0">
+            <columns>
+                <TableColumn fx:id="columnWriterID" maxWidth="50.0" minWidth="50.0" prefWidth="50.0" resizable="false"
+                             text="#"/>
+                <TableColumn fx:id="columnWriterName" editable="false" maxWidth="143.0" minWidth="143.0"
+                             prefWidth="143.0" resizable="false" text="Scenarzysta"/>
+            </columns>
+        </TableView>
     </StackPane>
     <TextField fx:id="fieldCurrentMovieTitle" alignment="CENTER" editable="false" layoutX="246.0" layoutY="30.0"
-               promptText="Title" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="220.0"
-               AnchorPane.topAnchor="10.0"/>
+               prefHeight="26.0" prefWidth="148.0" promptText="Title" AnchorPane.leftAnchor="270.0"
+               AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0"/>
     <TextField fx:id="fieldCurrentMovieID" alignment="CENTER" editable="false" layoutX="270.0" layoutY="55.0"
                promptText="ID" AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="380.0"
                AnchorPane.topAnchor="10.0"/>
-    <GridPane alignment="CENTER" gridLinesVisible="true" layoutX="231.0" layoutY="36.0"
-              style="-fx-background-color: white;" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="220.0"
-              AnchorPane.rightAnchor="220.0" AnchorPane.topAnchor="45.0">
-      <columnConstraints>
-          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="117.20001220703125" minWidth="10.0"
-                             prefWidth="106.0"/>
-          <ColumnConstraints hgrow="SOMETIMES" maxWidth="140.39996337890625" minWidth="10.0" prefWidth="106.0"/>
-      </columnConstraints>
-      <rowConstraints>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
-      </rowConstraints>
-          <Label text="URL:"/>
-          <Label text="Czas Trwania:" GridPane.rowIndex="1"/>
-          <Label text="Język:" GridPane.rowIndex="2"/>
-          <Label text="Data Produkcji:" GridPane.rowIndex="3"/>
-          <Label text="Kraj Pochodzenia:" GridPane.rowIndex="4"/>
-          <ScrollPane prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" GridPane.columnIndex="1">
-                  <TextField fx:id="fieldCurrentMovieImdbUrl" alignment="CENTER" editable="false" prefHeight="26.0"
-                             prefWidth="99.0" promptText="URL"/>
-          </ScrollPane>
-          <TextField fx:id="fieldCurrentMovieRuntime" alignment="CENTER" editable="false" promptText="Czas Trwania"
-                     GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-          <TextField fx:id="fieldCurrentMovieReleaseDate" alignment="CENTER" editable="false"
-                     promptText="Data Produkcji" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
-          <ScrollPane prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" GridPane.columnIndex="1"
-                      GridPane.rowIndex="2">
-                  <TextField fx:id="fieldCurrentMovieLanguage" alignment="CENTER" editable="false" prefHeight="26.0"
-                             prefWidth="99.0" promptText="Język"/>
-          </ScrollPane>
-          <ScrollPane prefHeight="200.0" prefWidth="200.0" vbarPolicy="NEVER" GridPane.columnIndex="1"
-                      GridPane.rowIndex="4">
-                  <TextField fx:id="fieldCurrentMovieCountryOfOrigin" alignment="CENTER" editable="false"
-                             prefWidth="98.0" promptText="Kraj Pochodzenia"/>
-          </ScrollPane>
+    <GridPane alignment="CENTER" gridLinesVisible="true" layoutX="426.0" layoutY="337.0" prefHeight="97.0"
+              prefWidth="410.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="10.0"
+              AnchorPane.leftAnchor="220.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="145.0">
+        <columnConstraints>
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="100.0" minWidth="100.0"
+                               prefWidth="100.0"/>
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="310.0" minWidth="310.0" prefWidth="310.0"/>
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
+        </rowConstraints>
+        <Label text="URL:"/>
+        <VBox alignment="CENTER" GridPane.columnIndex="1">
+            <TextField fx:id="fieldCurrentMovieImdbUrl" alignment="CENTER" editable="false" prefHeight="30.0"
+                       promptText="URL"/>
+        </VBox>
+        <Label text="Czas Trwania:" GridPane.rowIndex="1"/>
+        <Label text="Język:" GridPane.rowIndex="2"/>
+        <Label text="Data Produkcji:" GridPane.rowIndex="3"/>
+        <Label text="Kraj Pochodzenia:" GridPane.rowIndex="4"/>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="1">
+            <TextField fx:id="fieldCurrentMovieRuntime" alignment="CENTER" editable="false" prefHeight="30.0"
+                       promptText="Czas Trwania"/>
+        </VBox>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="3">
+            <TextField fx:id="fieldCurrentMovieReleaseDate" alignment="CENTER" editable="false" prefHeight="30.0"
+                       promptText="Data Produkcji"/>
+        </VBox>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="2">
+            <TextField fx:id="fieldCurrentMovieLanguage" alignment="CENTER" editable="false" prefHeight="30.0"
+                       promptText="Język"/>
+        </VBox>
+        <VBox GridPane.columnIndex="1" GridPane.rowIndex="4">
+            <TextField fx:id="fieldCurrentMovieCountryOfOrigin" alignment="CENTER" editable="false"
+                       prefHeight="30.0" promptText="Kraj Pochodzenia"/>
+        </VBox>
     </GridPane>
 </AnchorPane>
