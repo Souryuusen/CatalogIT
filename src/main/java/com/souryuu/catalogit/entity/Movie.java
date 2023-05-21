@@ -9,7 +9,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "MOVIES")
@@ -37,7 +39,7 @@ public class Movie{
 
     @Getter @Setter
     @ManyToMany(cascade = {CascadeType.MERGE})
-    @JsonIgnoreProperties({"directors", "writers", "reviews"})
+    @JsonIgnoreProperties({"directors", "writers", "reviews", "genres", "tags"})
     @JoinTable(
             name = "MOVIE_DIRECTORS",
             joinColumns = @JoinColumn(name = "movie_id"),
@@ -53,6 +55,24 @@ public class Movie{
             inverseJoinColumns = @JoinColumn(name = "writer_id")
     )
     private Set<Writer> writers;
+
+    @Getter @Setter
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "MOVIE_GENRES",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
+    )
+    private Set<Genre> genres;
+
+    @Getter @Setter
+    @ManyToMany(cascade = {CascadeType.MERGE})
+    @JoinTable(
+            name = "MOVIE_TAGS",
+            joinColumns = @JoinColumn(name = "movie_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<Tag> tags;
 
     @Getter @Setter
     @OneToMany(mappedBy = "reviewedMovie", cascade = {CascadeType.MERGE})
@@ -73,6 +93,8 @@ public class Movie{
         this.setReleaseDate(data.getProductionDetails().get(ProductionDetailKeys.RELEASE_DATE));
         this.setCountryOfOrigin(data.getProductionDetails().get(ProductionDetailKeys.COUNTRY_OF_ORIGIN));
         this.setLanguage(data.getProductionDetails().get(ProductionDetailKeys.LANGUAGE));
+        this.setGenres(data.getGenres().stream().map(Genre::new).collect(Collectors.toSet()));
+        this.setTags(data.getTags().stream().map(Tag::new).collect(Collectors.toSet()));
     }
 
     public boolean addWriter(Writer writer) {
@@ -97,6 +119,22 @@ public class Movie{
 
     public boolean removeReview(Review review) {
         return getReviews().remove(review);
+    }
+
+    public boolean addGenre(Genre genre) {
+        return getGenres().add(genre);
+    }
+
+    public boolean removeGenre(Genre genre) {
+        return getGenres().remove(genre);
+    }
+
+    public boolean addTag(Tag tag) {
+        return getTags().add(tag);
+    }
+
+    public boolean removeTag(Tag tag) {
+        return getTags().remove(tag);
     }
 
     @Override
@@ -124,5 +162,103 @@ public class Movie{
         } else {
             return false;
         }
+    }
+
+    public static class Builder {
+        private String title;
+        private String imdbUrl;
+        private String coverUrl;
+        private String runtime;
+        private String language;
+        private String releaseDate;
+        private String countryOfOrigin;
+
+        private Set<Director> directors;
+        private Set<Writer> writers;
+        private Set<Review> reviews;
+        private Set<Genre> genres;
+        private Set<Tag> tags;
+
+        public Movie build() {
+            Movie m = new Movie(imdbUrl);
+            m.setTitle(this.title);
+            m.setCoverUrl(this.coverUrl);
+            m.setRuntime(this.runtime);
+            m.setLanguage(this.language);
+            m.setReleaseDate(this.releaseDate);
+            m.setCountryOfOrigin(this.countryOfOrigin);
+            m.setWriters(this.writers);
+            m.setDirectors(this.directors);
+            m.setReviews(this.reviews);
+            m.setGenres(this.genres);
+            m.setTags(this.tags);
+            return m;
+        }
+
+        public Builder withTitle(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public Builder withImdbUrl(String imdbUrl) {
+            this.imdbUrl = imdbUrl;
+            return this;
+        }
+
+        public Builder withCoverUrl(String coverUrl) {
+            this.coverUrl = coverUrl;
+            return this;
+        }
+
+        public Builder withRuntime(String runtime) {
+            this.runtime = runtime;
+            return this;
+        }
+
+        public Builder withLanguage(String language) {
+            this.language = language;
+            return this;
+        }
+
+        public Builder withReleaseDate(String releaseDate) {
+            this.releaseDate = releaseDate;
+            return this;
+        }
+
+        public Builder withCountryOfOrigin(String countryOfOrigin) {
+            this.countryOfOrigin = countryOfOrigin;
+            return this;
+        }
+
+        public Builder withDirectors(Set<Director> directors) {
+            this.directors = new HashSet<>();
+            this.directors.addAll(directors);
+            return this;
+        }
+
+        public Builder withWriters(Set<Writer> writers) {
+            this.writers = new HashSet<>();
+            this.writers.addAll(writers);
+            return this;
+        }
+
+        public Builder withReviews(Set<Review> reviews) {
+            this.reviews = new HashSet<>();
+            this.reviews.addAll(reviews);
+            return this;
+        }
+
+        public Builder withGenres(Set<Genre> genres) {
+            this.genres = new HashSet<>();
+            this.genres.addAll(genres);
+            return this;
+        }
+
+        public Builder withTags(Set<Tag> tags) {
+            this.tags = new HashSet<>();
+            this.tags.addAll(tags);
+            return this;
+        }
+
     }
 }

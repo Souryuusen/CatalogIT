@@ -14,9 +14,13 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.AnchorPane;
+import javafx.scene.input.KeyCode;
+import javafx.scene.layout.*;
 import lombok.*;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -101,12 +105,21 @@ public class MovieListController {
         }
         comboSearchBy.getSelectionModel().select(0);
         createBindings();
+        attachListeners();
     }
 
     private void createBindings() {
         BooleanProperty currentMovieNullProperty = new SimpleBooleanProperty(currentMovie == null);
         btnShowMovieDetails.disableProperty().bind(currentMovieNullProperty);
         btnShowReviewDetails.disableProperty().bind(currentMovieNullProperty);
+    }
+
+    private void attachListeners() {
+        fieldSearch.setOnKeyReleased(event -> {
+            if(event.getCode() == KeyCode.ENTER) {
+                onBtnSearchAction();
+            }
+        });
     }
 
     @FXML
@@ -132,7 +145,7 @@ public class MovieListController {
                 long idCriteria = Long.parseLong(valueString);
                 currentMovieList = movieService.findAllByIdWithReviews(idCriteria);
             } catch (NumberFormatException ex) {
-                ex.printStackTrace();
+//                ex.printStackTrace();
                 DialogUtility.createErrorDialog("Niepoprawna Wartość ID", "Wprowadzona wartość: " +
                         fieldSearch.getText() + " nie jest poprawną wartością dla pola ID!");
             } finally {
@@ -177,6 +190,11 @@ public class MovieListController {
     public void onBtnShowMovieDetailsAction() {
         if(currentMovie != null) {
             changeDetailsPane(MovieListMovieDetailsController.class);
+            imageCover.setOnMouseClicked(mouseEvent -> {
+                if(mouseEvent.getClickCount() == 2 && currentMovie.getImdbUrl() != null && currentMovie.getImdbUrl().length() > 0) {
+                    // TODO: Add Dialog Creation Method
+                }
+            });
             showMovieData(currentMovie);
         }
     }
@@ -193,7 +211,6 @@ public class MovieListController {
         }
     }
 
-    //TODO: Add errorImage For Situation When Can't Display Proper Cover (blank image or "NO IMG")
     private void showMovieData(Movie m) {
         // Display Movie Cover
         FXUtility.changeImageViewContent(imageCover, m.getCoverUrl(), true);

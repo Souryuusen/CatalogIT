@@ -9,62 +9,62 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane fx:id="root" prefHeight="600" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MainController">
-   <children>
-      <SplitPane dividerPositions="0.2" layoutX="5.0" layoutY="31.0" maxWidth="800.0" minWidth="800.0" prefHeight="600" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
+<AnchorPane fx:id="root" prefHeight="600" prefWidth="800.0" xmlns="http://javafx.com/javafx/19"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MainController">
+    <SplitPane dividerPositions="0.2" layoutX="5.0" layoutY="31.0" maxWidth="800.0" minWidth="800.0"
+               prefHeight="600" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
         <items>
-          <AnchorPane fx:id="controlRoot" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
-               <children>
-                  <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="37.0" prefHeight="593.0" prefWidth="120.0" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                     <children>
-                        <Button fx:id="btnAddNewMovie" onAction="#onBtnAddNewMovieAction" prefHeight="30.0" prefWidth="120.0" text="Dodaj Nowy Film" textAlignment="CENTER" wrapText="true">
-                           <VBox.margin>
-                              <Insets top="10.0" />
-                           </VBox.margin>
-                        </Button>
-                        <Button fx:id="btnViewAllMovies" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onBtnViewAllMoviesAction" prefHeight="30.0" prefWidth="120.0" text="Przeglądaj Filmy" />
-                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
-                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
-                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
-                        <Button minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" prefHeight="30.0" prefWidth="100.0" text="Button" />
-                     </children>
-                     <opaqueInsets>
-                        <Insets />
-                     </opaqueInsets>
-                  </VBox>
-               </children>
+            <AnchorPane fx:id="controlRoot" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                <VBox fx:id="paneNavRoot" alignment="TOP_CENTER" layoutX="14.0" layoutY="37.0"
+                      prefHeight="593.0" prefWidth="120.0" spacing="20.0" AnchorPane.bottomAnchor="0.0"
+                      AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Button fx:id="btnAddNewMovie" onAction="#onBtnAddNewMovieAction" prefHeight="30.0"
+                            prefWidth="120.0" text="Dodaj Nowy Film" textAlignment="CENTER" wrapText="true">
+                        <VBox.margin>
+                            <Insets top="10.0"/>
+                        </VBox.margin>
+                    </Button>
+                    <Button fx:id="btnViewAllMovies" minHeight="-Infinity" minWidth="-Infinity"
+                            mnemonicParsing="false" onAction="#onBtnViewAllMoviesAction" prefHeight="30.0"
+                            prefWidth="120.0" text="Przeglądaj Filmy"/>
+                    <opaqueInsets>
+                        <Insets/>
+                    </opaqueInsets>
+                </VBox>
             </AnchorPane>
-          <AnchorPane fx:id="contentRoot" minHeight="0.0" minWidth="0.0" prefHeight="593.0" prefWidth="654.0" />
+            <AnchorPane fx:id="contentRoot" maxHeight="570.0" maxWidth="640.0" minHeight="570.0" minWidth="640.0"
+                        prefHeight="570.0" prefWidth="640.0" SplitPane.resizableWithParent="false"/>
         </items>
-         <opaqueInsets>
-            <Insets />
-         </opaqueInsets>
-      </SplitPane>
-      <AnchorPane fx:id="menuRoot" layoutX="170.0" layoutY="113.0" prefHeight="26.0" prefWidth="134.0" AnchorPane.bottomAnchor="568.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <children>
-            <MenuBar prefHeight="25.6" prefWidth="133.6" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-              <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
-                  </items>
+        <opaqueInsets>
+            <Insets/>
+        </opaqueInsets>
+    </SplitPane>
+    <AnchorPane fx:id="menuRoot" layoutX="170.0" layoutY="113.0" prefHeight="26.0" prefWidth="134.0"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <MenuBar fx:id="menuBar" prefHeight="25.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                 AnchorPane.topAnchor="0.0">
+            <menus>
+                <Menu fx:id="menuFile" mnemonicParsing="false" text="File">
+                    <items>
+                        <MenuItem fx:id="menuItemClose" mnemonicParsing="false"
+                                  onAction="#onMenuItemCloseAction" text="Close"/>
+                    </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
+                <Menu fx:id="menuEdit" mnemonicParsing="false" text="Edit">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Dodaj Nowy Film"/>
+                    </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="About"/>
+                    </items>
                 </Menu>
-              </menus>
-            </MenuBar>
-         </children>
-      </AnchorPane>
-   </children>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-   </padding>
+            </menus>
+        </MenuBar>
+    </AnchorPane>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
 </AnchorPane>

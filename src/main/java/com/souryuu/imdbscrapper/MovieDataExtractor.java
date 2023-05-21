@@ -323,12 +323,26 @@ public class MovieDataExtractor implements Extractable {
         return Arrays.stream(input.split(" "))
                 .map(String::toLowerCase)
                 .map(s -> {
-                    String tmp = s.replaceAll("\\W", "");
-                    if(tmp.length() > 1) {
-                        String tmp2 = tmp.replaceFirst(tmp.substring(0, 1), tmp.substring(0, 1).toUpperCase());
-                        return s.replace(tmp, tmp2);
+                    if(s.contains("-")) {
+                        String[] splitted = s.split("-");
+                        for(int i = 0; i < splitted.length; i++) {
+                            String tmp = splitted[i];
+                            String tmp2 = tmp.replaceAll("\\W", "");
+                            if (tmp2.length() > 1) {
+                                String tmp3 = tmp2.replaceFirst(tmp2.substring(0, 1), tmp2.substring(0, 1).toUpperCase());
+                                splitted[i] = tmp3;
+                            }
+                        }
+                        String result = Arrays.stream(splitted).collect(Collectors.joining("-")).toString();
+                        return result;
                     } else {
-                        return s;
+                        String tmp = s.replaceAll("\\W", "");
+                        if (tmp.length() > 1) {
+                            String tmp2 = tmp.replaceFirst(tmp.substring(0, 1), tmp.substring(0, 1).toUpperCase());
+                            return s.replace(tmp, tmp2);
+                        } else {
+                            return s;
+                        }
                     }
                 }).collect(Collectors.joining(" "));
     }

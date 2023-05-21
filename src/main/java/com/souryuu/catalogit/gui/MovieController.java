@@ -1,14 +1,9 @@
 package com.souryuu.catalogit.gui;
 
-import com.souryuu.catalogit.entity.Director;
-import com.souryuu.catalogit.entity.Movie;
+import com.souryuu.catalogit.entity.*;
 import com.souryuu.catalogit.entity.Writer;
-import com.souryuu.catalogit.entity.Review;
 import com.souryuu.catalogit.exception.ViewLoadException;
-import com.souryuu.catalogit.service.DirectorService;
-import com.souryuu.catalogit.service.MovieService;
-import com.souryuu.catalogit.service.ReviewService;
-import com.souryuu.catalogit.service.WriterService;
+import com.souryuu.catalogit.service.*;
 import com.souryuu.catalogit.utility.DialogUtility;
 import com.souryuu.catalogit.utility.ExternalFileParser;
 import com.souryuu.catalogit.utility.FXUtility;
@@ -51,6 +46,8 @@ public class MovieController {
     private final DirectorService directorService;
     private final WriterService writerService;
     private final ReviewService reviewService;
+    private final GenreService genreService;
+    private final TagService tagService;
 
     //##################################################################################################################
 
@@ -123,12 +120,14 @@ public class MovieController {
     @FXML TableColumn<Writer, Long> columnWritersID;
     @FXML TableColumn<Writer, String> columnWritersName;
 
-    public MovieController(MovieService movieService, DirectorService directorService, WriterService writerService, FxWeaver fxWeaver, ReviewService reviewService) {
+    public MovieController(MovieService movieService, DirectorService directorService, WriterService writerService, FxWeaver fxWeaver, ReviewService reviewService, GenreService genreService, TagService tagService) {
         this.movieService = movieService;
         this.directorService = directorService;
         this.writerService = writerService;
         this.fxWeaver = fxWeaver;
         this.reviewService = reviewService;
+        this.genreService = genreService;
+        this.tagService = tagService;
     }
     //##################################################################################################################
 
@@ -198,14 +197,30 @@ public class MovieController {
                     for (String line : br.lines().toList()) {
                         List<String> lineData = efp.parseMovieLine(line);
 
-                        if (lineData.size() != 4) continue;
+                        String imdbUrl = "";
+                        boolean wasWatched = false;
+                        if (lineData.size() == 4) {
+                            wasWatched = true;
+                            imdbUrl = lineData.get(2).trim();
+                        } else {
+                            wasWatched = false;
+                            for(String data : lineData) {
+                                if(Movie.validateImdbLink(data)) {
+                                    imdbUrl = data.trim();
+                                }
+                            }
+                        }
+                        if(imdbUrl.equalsIgnoreCase("")) {
+                            System.out.println("Problem While Parsing IMDB URL\t-\t" + line);
+                        }
 
-                        String imdbUrl = lineData.get(2).trim();
                         if (movieService.getMovieByImdbUrl(imdbUrl) == null) {
                             MovieData scrapedData = ScraperUtility.scrapeData(imdbUrl);
                             Movie movieToAdd = new Movie(imdbUrl, scrapedData);
                             HashSet<Director> directorsToAdd = new HashSet<>();
                             HashSet<Writer> writersToAdd = new HashSet<>();
+                            HashSet<Tag> tagsToAdd = new HashSet<>();
+                            HashSet<Genre> genresToAdd = new HashSet<>();
                             for (String directorName : scrapedData.getDirectors()) {
                                 String n = ScraperUtility.formatToCamelCase(directorName);
                                 if (!directorService.existsByNameIgnoreCase(ScraperUtility.formatToCamelCase(directorName))) {
@@ -228,14 +243,37 @@ public class MovieController {
                                 }
                             }
                             movieToAdd.setWriters(writersToAdd);
+                            for(String genreName : scrapedData.getGenres()) {
+                                String n = ScraperUtility.formatToCamelCase(genreName);
+                                if(!genreService.existsByGenreName(n)) {
+                                    Genre g = new Genre(n);
+                                    genreService.save(g);
+                                    genresToAdd.add(g);
+                                } else {
+                                    genresToAdd.add(genreService.findGenreByGenreName(n));
+                                }
+                            }
+                            movieToAdd.setGenres(genresToAdd);
+                            for(String tagName : scrapedData.getTags()) {
+                                String n = ScraperUtility.formatToCamelCase(tagName);
+                                if(!tagService.existsByTagName(n)) {
+                                    Tag t = new Tag(n);
+                                    tagService.save(t);
+                                    tagsToAdd.add(t);
+                                } else {
+                                    tagsToAdd.add(tagService.findTagByTagName(n));
+                                }
+                            }
+                            movieToAdd.setTags(tagsToAdd);
                             movieService.save(movieToAdd);
                             System.out.println(movieToAdd);
                             // Review
-                            double rating = Double.parseDouble(lineData.get(1).trim());
-                            rating *= 10.0;
-                            Review r = new Review((int) rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
-                            reviewService.save(r);
-                            System.out.println(r);
+                            if(wasWatched) {
+                                double rating = Double.parseDouble(lineData.get(1).trim());
+                                rating *= 10.0;
+                                Review r = new Review((int) rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
+                                reviewService.save(r);
+                            }
                             Platform.runLater(() -> {
                                 textImdbLink.setText(movieToAdd.getImdbUrl());
                                 textTitle.setText(movieToAdd.getTitle());

@@ -1,18 +1,16 @@
 package com.souryuu.catalogit.gui;
 
-import javafx.application.HostServices;
+import com.souryuu.catalogit.exception.ViewLoadException;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.SubScene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
-import javafx.stage.Stage;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.Optional;
 
 @Component
 @FxmlView("main-window-view.fxml")
@@ -20,11 +18,12 @@ public class MainController {
 
     private final FxWeaver fxWeaver;
 
-    @FXML
-    AnchorPane root, menuRoot, controlRoot, contentRoot;
+    @FXML AnchorPane root;
+    @FXML AnchorPane menuRoot;
+    @FXML AnchorPane controlRoot;
+    @FXML AnchorPane  contentRoot;
 
-    @FXML
-    Button btnAddNewMovie;
+    @FXML Button btnAddNewMovie;
     @FXML Button btnViewAllMovies;
 
     public MainController(FxWeaver fxWeaver) {
@@ -36,14 +35,25 @@ public class MainController {
         changeDisplayedContent(MovieController.class);
     }
 
+    @FXML
     public void onBtnViewAllMoviesAction() {
         changeDisplayedContent(MovieListController.class);
     }
 
-    private void changeDisplayedContent(Class clazz) {
+    @FXML
+    public void onMenuItemCloseAction() {
+        Platform.exit();
+    }
+
+    private void changeDisplayedContent(Class<?> clazz) {
         contentRoot.getChildren().clear();
-        Node newContent = (Node) fxWeaver.load(clazz).getView().get();
-        contentRoot.getChildren().setAll(newContent);
+        Optional<Node> viewOptional = fxWeaver.load(clazz).getView();
+        if(viewOptional.isPresent()) {
+            Node newContent = viewOptional.get();
+            contentRoot.getChildren().setAll(newContent);
+        }else {
+            throw new ViewLoadException("Error Loading View From " + clazz.getName() + " !!");
+        }
     }
 
 }

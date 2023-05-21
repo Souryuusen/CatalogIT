@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.souryuu</groupId>
     <artifactId>CatalogIT</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.1.3</version>
     <name>CatalogIT</name>
     <description>CatalogIT</description>
     <properties>

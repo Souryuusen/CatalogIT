@@ -23,6 +23,7 @@ public class DialogUtility {
         alert.setTitle(title);
         alert.setContentText(msg);
         alert.getButtonTypes().add(new ButtonType("OK"));
+        alert.showAndWait();
     }
 
 }

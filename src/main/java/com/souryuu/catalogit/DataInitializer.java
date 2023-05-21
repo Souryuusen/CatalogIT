@@ -4,17 +4,12 @@ import com.souryuu.catalogit.entity.*;
 import com.souryuu.catalogit.service.DirectorService;
 import com.souryuu.catalogit.service.MovieService;
 import com.souryuu.catalogit.service.ReviewService;
-import com.souryuu.catalogit.utility.ScraperUtility;
-import jakarta.persistence.Persistence;
+import com.souryuu.imdbscrapper.MovieDataExtractor;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class DataInitializer implements CommandLineRunner {
@@ -86,15 +81,7 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
-        String input = "\\\\(ancient\\\\)";
-        String in2 = input.replaceAll("\\W","");
-        String x = in2.replaceFirst(in2.substring(0,1), in2.substring(0,1).toUpperCase());
-        String result = input.replace(in2, x);
-        System.out.println(result);
-        //        Arrays.asList(input.split(" "))
-//                .stream().map(s -> s.toLowerCase())
-//                .map(s ->
-//                    s.replaceFirst(s.substring(0,1), s.substring(0,1).toUpperCase()))
-//                .collect(Collectors.joining(" "));
+        String test = "sci-fi";
+        System.out.println(MovieDataExtractor.formatToCamelCase(test));
     }
 }
