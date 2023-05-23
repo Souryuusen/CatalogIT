@@ -6,10 +6,15 @@ import com.souryuu.catalogit.entity.Review;
 import com.souryuu.catalogit.entity.Writer;
 import com.souryuu.catalogit.exception.ViewLoadException;
 import com.souryuu.catalogit.service.MovieService;
+import com.souryuu.catalogit.service.ReviewService;
 import com.souryuu.catalogit.utility.DialogUtility;
 import com.souryuu.catalogit.utility.FXUtility;
+import javafx.application.HostServices;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -21,6 +26,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
+import javafx.util.Callback;
 import lombok.*;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -30,6 +36,7 @@ import org.springframework.stereotype.Component;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +50,10 @@ public class MovieListController {
 
 
     private final MovieService movieService;
+    private final ReviewService reviewService;
     private final FxWeaver fxWeaver;
+
+    private final HostServices hostServices;
 
     private Movie currentMovie;
     private List<Movie> currentMovieList;
@@ -81,7 +91,7 @@ public class MovieListController {
     @FXML TableColumn<MovieDTO, Long> columnMovieID;
     @FXML TableColumn<MovieDTO, String> columnMovieTitle;
     @FXML TableColumn<MovieDTO, Integer> columnMovieReviewAmount;
-    @FXML TableColumn<MovieDTO, String> columnMovieAverageRating;
+    @FXML TableColumn<MovieDTO, Number> columnMovieAverageRating;
     @FXML TableColumn<Director, Long> columnDirectorID;
     @FXML TableColumn<Director, String> columnDirectorName;
     @FXML TableColumn<Writer, Long> columnWriterID;
@@ -92,9 +102,11 @@ public class MovieListController {
 
 
 
-    public MovieListController(MovieService movieService, FxWeaver fxWeaver) {
+    public MovieListController(MovieService movieService, ReviewService reviewService, FxWeaver fxWeaver, HostServices hostServices) {
         this.movieService = movieService;
+        this.reviewService = reviewService;
         this.fxWeaver = fxWeaver;
+        this.hostServices = hostServices;
     }
 
     @FXML
@@ -195,13 +207,18 @@ public class MovieListController {
                     // TODO: Add Dialog Creation Method
                 }
             });
+            fieldCurrentMovieImdbUrl.setOnMouseClicked(mouseEvent -> {
+                if(mouseEvent.getClickCount() == 2) {
+                    this.hostServices.showDocument(currentMovie.getImdbUrl());
+                }
+            });
             showMovieData(currentMovie);
         }
     }
 
     @FXML
     public void onBtnShowReviewDetailsAction() {
-        if(currentMovie != null && Hibernate.isInitialized(currentMovie.getReviews()) && currentMovie.getReviews().size() > 0){
+        if(currentMovie != null && Hibernate.isInitialized(currentMovie.getReviews()) && currentMovie.getReviews() != null && currentMovie.getReviews().size() > 0){
             changeDetailsPane(MovieListReviewDetailsController.class);
             showMovieReviewData(currentMovie);
         } else {
@@ -214,18 +231,33 @@ public class MovieListController {
     private void showMovieData(Movie m) {
         // Display Movie Cover
         FXUtility.changeImageViewContent(imageCover, m.getCoverUrl(), true);
-        // Fill Movie Specs Along With Generated ID
-        fieldCurrentMovieID.setText(String.valueOf(m.getMovieID()));
-        fieldCurrentMovieTitle.setText(m.getTitle().trim());
-        // Fill Technical Specs Of Current Movie
-        fieldCurrentMovieImdbUrl.setText(m.getImdbUrl().trim());
-        fieldCurrentMovieRuntime.setText(m.getRuntime().trim());
-        fieldCurrentMovieLanguage.setText(m.getLanguage().trim());
-        fieldCurrentMovieReleaseDate.setText(m.getReleaseDate().trim());
-        fieldCurrentMovieCountryOfOrigin.setText(m.getCountryOfOrigin().trim());
-        // Fill Writers And Directors Tables
-        fillTableWithDirectorData(m.getDirectors().stream().toList());
-        fillTableWithWriterData(m.getWriters().stream().toList());
+        if(m != null && m.getMovieID() != 0) {
+            // Fill Movie Specs Along With Generated ID
+            fieldCurrentMovieID.setText(String.valueOf(m.getMovieID()));
+            fieldCurrentMovieTitle.setText(m.getTitle().trim());
+            // Fill Technical Specs Of Current Movie
+            fieldCurrentMovieImdbUrl.setText(m.getImdbUrl().trim());
+            fieldCurrentMovieRuntime.setText(m.getRuntime().trim());
+            fieldCurrentMovieLanguage.setText(m.getLanguage().trim());
+            fieldCurrentMovieReleaseDate.setText(m.getReleaseDate().trim());
+            fieldCurrentMovieCountryOfOrigin.setText(m.getCountryOfOrigin().trim());
+            // Fill Writers And Directors Tables
+            fillTableWithDirectorData(m.getDirectors().stream().toList());
+            fillTableWithWriterData(m.getWriters().stream().toList());
+        } else {
+            // Fill Movie Specs Along With Generated ID
+            fieldCurrentMovieID.setText("");
+            fieldCurrentMovieTitle.setText("");
+            // Fill Technical Specs Of Current Movie
+            fieldCurrentMovieImdbUrl.setText("");
+            fieldCurrentMovieRuntime.setText("");
+            fieldCurrentMovieLanguage.setText("");
+            fieldCurrentMovieReleaseDate.setText("");
+            fieldCurrentMovieCountryOfOrigin.setText("");
+            // Fill Writers And Directors Tables
+            fillTableWithDirectorData(List.of());
+            fillTableWithWriterData(List.of());
+        }
     }
 
     private void showMovieReviewData(Movie m) {
@@ -260,6 +292,7 @@ public class MovieListController {
             tableMovies.setItems(FXCollections.observableList(movieDTOArrayList));
             tableMovies.getSortOrder().add(columnMovieID);
             tableMovies.sort();
+            tableMovies.scrollTo(tableMovies.getItems().size()-1);
         }
     }
 
@@ -268,8 +301,22 @@ public class MovieListController {
         columnMovieID.setSortType(TableColumn.SortType.ASCENDING);
         columnMovieTitle.setCellValueFactory(new PropertyValueFactory<>("title"));
         columnMovieReviewAmount.setCellValueFactory(new PropertyValueFactory<>("reviewsCount"));
-        columnMovieAverageRating.setCellValueFactory(new PropertyValueFactory<>("averageRating"));
-        // Table Row Clicked Listener
+        columnMovieAverageRating.setCellValueFactory(new PropertyValueFactory<>("avgRating"));
+        columnMovieAverageRating.setCellFactory(tc -> new TableCell<MovieDTO, Number>() {
+            @Override
+            protected void updateItem(Number averageRating, boolean empty) {
+                if (empty) {
+                    setText("");
+                } else {
+                    if(averageRating != null && averageRating.doubleValue() >= 0) {
+                        setText(String.format("%.2f", averageRating.doubleValue()));
+                    } else {
+                        setText("-");
+                    }
+                }
+            }
+        });
+        // Opening Movie Details After Double-Click
         tableMovies.setRowFactory(rf -> {
             TableRow<MovieDTO> row = new TableRow<>();
             row.setOnMouseClicked(mouseEvent -> {
@@ -280,18 +327,55 @@ public class MovieListController {
             });
             return row;
         });
+        // Removing Selected Movie From DB
+        tableMovies.setOnKeyReleased(keyEvent -> {
+            if(keyEvent.getCode() == KeyCode.DELETE) {
+                MovieDTO movieDTO = tableMovies.getSelectionModel().getSelectedItem();
+                if (movieDTO != null) {
+                    long movieID = movieDTO.getMovieID();
+                    if(movieService.existsById(movieID)) {
+                        boolean isDeleted;
+                        if(movieDTO.getReviewsCount() != 0) {
+                            Movie m = movieService.getMovieWithInitialization(movieID);
+                            for(Review r : m.getReviews()) {
+                                reviewService.deleteByReviewID(r.getReviewID());
+                            }
+                            isDeleted = movieService.deleteMovieById(m.getMovieID());
+                        } else {
+                            isDeleted = movieService.deleteMovieById(movieID);
+                        }
+                        if(isDeleted) {
+                            onBtnRefreshDatabaseAction();
+                        }
+                    }
+                    if(currentMovie != null && currentMovie.getMovieID() == movieID) {
+                        currentMovie = new Movie();
+                        Platform.runLater(() -> {
+                            showMovieData(currentMovie);
+                            paneDetails.getChildren().clear();
+                        });
+                    }
+                }
+            }
+        });
+
     }
 
     private void fillTableWithDirectorData(List<Director> directorList) {
         // Validate Argument
-        if(directorList == null || directorList.size() == 0) throw new IllegalArgumentException("Collection To Display Can't Be Null Or Empty!");
-        // Initialize Table Parameters
+        if(directorList == null) {
+            throw new IllegalArgumentException("Collection To Display Can't Be Null!");
+        }
         initializeDirectorsTableProperties();
-        tableDirectors.getItems().clear();
-        //Fill Table With MovieDTO Data
-        tableDirectors.setItems(FXCollections.observableList(directorList));
-        tableDirectors.getSortOrder().add(columnDirectorID);
-        tableDirectors.sort();
+        if(directorList.size() == 0) {
+            tableDirectors.getItems().clear();
+        } else {
+            tableDirectors.getItems().clear();
+            //Fill Table With MovieDTO Data
+            tableDirectors.getItems().addAll(FXCollections.observableList(directorList));
+            tableDirectors.getSortOrder().add(columnDirectorID);
+            tableDirectors.sort();
+        }
     }
 
     private void initializeDirectorsTableProperties() {
@@ -310,14 +394,21 @@ public class MovieListController {
 
     private void fillTableWithWriterData(List<Writer> writerList) {
         // Validate Argument
-        if(writerList == null || writerList.size() == 0) throw new IllegalArgumentException("Collection To Display Can't Be Null Or Empty!");
-        // Initialize Table Parameters
-        initializeWritersTableProperties();
-        tableWriters.getItems().clear();
-        //Fill Table With MovieDTO Data
-        tableWriters.setItems(FXCollections.observableList(writerList));
-        tableWriters.getSortOrder().add(columnWriterID);
-        tableWriters.sort();
+        if(writerList == null) {
+            throw new IllegalArgumentException("Collection To Display Can't Be Null Or Empty!");
+        }
+        if(writerList.size() == 0) {
+            initializeWritersTableProperties();
+            tableWriters.getItems().clear();
+        } else {
+            // Initialize Table Parameters
+            initializeWritersTableProperties();
+            tableWriters.getItems().clear();
+            //Fill Table With MovieDTO Data
+            tableWriters.getItems().addAll(FXCollections.observableList(writerList));
+            tableWriters.getSortOrder().add(columnWriterID);
+            tableWriters.sort();
+        }
     }
 
     private void initializeWritersTableProperties() {
@@ -343,7 +434,7 @@ public class MovieListController {
         // Map Reviews To ReviewDTOs Objects
         List<ReviewDTO> reviewDTOList = reviewList.stream().map(ReviewDTO::new).toList();
         //Fill Table With MovieDTO Data
-        tableReviews.setItems(FXCollections.observableList(reviewDTOList));
+        tableReviews.getItems().addAll(FXCollections.observableList(reviewDTOList));
         tableReviews.getSortOrder().add(columnReviewID);
         tableReviews.sort();
     }
@@ -367,6 +458,8 @@ public class MovieListController {
 
     @Data
     public static class MovieDTO {
+
+        private DoubleProperty avgRating = new SimpleDoubleProperty(-1);
         private int reviewsCount;
         private long movieID;
         private String averageRating;
@@ -395,11 +488,24 @@ public class MovieListController {
                     for (Review r : m.getReviews()) avg += r.getRating();
                     avg /= m.getReviews().size();
                     avg /= 10;
+                    avgRating.setValue(avg);
                     setAverageRating(String.format("%.2f", avg));
                 } else {
                     setAverageRating("-");
                 }
             }
+        }
+
+        public DoubleProperty avgRatingProperty() {
+            return avgRating;
+        }
+
+        public final double getAvgRating() {
+            return avgRatingProperty().get();
+        }
+
+        public final void setAvgRating(double avgRating) {
+            avgRatingProperty().set(avgRating);
         }
     }
 

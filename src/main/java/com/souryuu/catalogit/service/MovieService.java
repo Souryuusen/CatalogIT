@@ -71,6 +71,10 @@ public class MovieService {
         return movie;
     }
 
+    public Movie getReferenceByID(long id){
+        return this.repository.getReferenceById(id);
+    }
+
     public Movie getMovieByIdWithReviews(long movieID) {
         Movie movie = this.repository.getMovieByMovieID(movieID);
         Hibernate.initialize(movie.getReviews());
@@ -87,5 +91,14 @@ public class MovieService {
         Hibernate.initialize(movie.getWriters());
         Hibernate.initialize(movie.getReviews());
         return movie;
+    }
+
+    public boolean deleteMovieById(long id) {
+        this.repository.deleteById(id);
+        return !existsById(id);
+    }
+
+    public boolean existsById(long id) {
+        return this.repository.existsById(id);
     }
 }

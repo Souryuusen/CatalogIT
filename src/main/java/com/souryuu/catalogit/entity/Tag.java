@@ -3,6 +3,7 @@ package com.souryuu.catalogit.entity;
 import com.google.common.base.Objects;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "TAGS")
@@ -17,6 +18,7 @@ public class Tag {
     @Getter @Setter
     @ToString.Include
     @Column(name = "tag_name") @NonNull
+    @NaturalId
     private String tagName;
 
     @Getter @Setter @ToString.Exclude

@@ -315,6 +315,34 @@ public class MovieController {
         if(currentMovie != null && currentMovie.getImdbUrl().length() > 0) {
             currentMovie.setDirectors(obtainCurrentDirectors());
             currentMovie.setWriters(obtainCurrentWriters());
+            Set<Genre> genres = currentMovie.getGenres();
+            Set<Genre> genreToAdd = new HashSet<>(currentMovie.getGenres().size());
+            for(Genre g : genres) {
+                if(g.getGenreID() != 0) {
+                    genreToAdd.add(g);
+                } else {
+                    if(genreService.existsByGenreName(g.getGenreName())) {
+                        genreToAdd.add(genreService.findGenreByGenreName(g.getGenreName()));
+                    } else {
+                        genreToAdd.add(genreService.save(g));
+                    }
+                }
+            }
+            Set<Tag> tags = currentMovie.getTags();
+            Set<Tag> tagToAdd = new HashSet<>(currentMovie.getTags().size());
+            for(Tag t : tags) {
+                if(t.getTagID() != 0) {
+                    tagToAdd.add(t);
+                } else {
+                    if(tagService.existsByTagName(t.getTagName())) {
+                        tagToAdd.add(tagService.findTagByTagName(t.getTagName()));
+                    } else {
+                        tagToAdd.add(tagService.save(t));
+                    }
+                }
+            }
+            currentMovie.setGenres(genreToAdd);
+            currentMovie.setTags(tagToAdd);
             movieService.save(currentMovie);
             currentMovie.setReviews(obtainCurrentReviews());
             movieService.save(currentMovie);

@@ -3,6 +3,7 @@ package com.souryuu.catalogit.entity;
 import com.google.common.base.Objects;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.NaturalId;
 
 @Entity
 @Table(name = "GENRES")
@@ -16,6 +17,7 @@ public class Genre {
 
     @Getter @Setter @ToString.Include
     @Column(name = "genre_name") @NonNull
+    @NaturalId
     private String genreName;
 
     @Getter @Setter @ToString.Exclude
