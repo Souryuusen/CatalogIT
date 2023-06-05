@@ -1,6 +1,6 @@
 package com.souryuu.catalogit.service;
 
-import com.souryuu.catalogit.entity.Genre;
+import com.souryuu.catalogit.entity.database.Genre;
 import com.souryuu.catalogit.repository.GenreRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +11,10 @@ public class GenreService {
 
     public GenreService(GenreRepository repository) {
         this.repository = repository;
+    }
+
+    public Genre findOrCreateNew(String genreName) {
+        return (!existsByGenreName(genreName)) ? save(new Genre(genreName)) : findGenreByGenreName(genreName);
     }
 
     public Genre save(Genre genre) {

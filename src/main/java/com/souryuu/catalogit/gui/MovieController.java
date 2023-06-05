@@ -1,14 +1,15 @@
 package com.souryuu.catalogit.gui;
 
-import com.souryuu.catalogit.entity.*;
-import com.souryuu.catalogit.entity.Writer;
+import com.souryuu.catalogit.entity.application.MovieData;
+import com.souryuu.catalogit.entity.database.*;
+import com.souryuu.catalogit.entity.database.Writer;
+import com.souryuu.catalogit.exception.ImdbLinkParsingException;
 import com.souryuu.catalogit.exception.ViewLoadException;
 import com.souryuu.catalogit.service.*;
 import com.souryuu.catalogit.utility.DialogUtility;
 import com.souryuu.catalogit.utility.ExternalFileParser;
 import com.souryuu.catalogit.utility.FXUtility;
 import com.souryuu.catalogit.utility.ScraperUtility;
-import com.souryuu.imdbscrapper.entity.MovieData;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -161,8 +162,8 @@ public class MovieController {
                 MovieData scrapedData = ScraperUtility.scrapeData(movieImdbLink);
                 currentMovie = new Movie(movieImdbLink, scrapedData);
                 currentReviews.clear();
-                addDirectors(scrapedData.getDirectors());
-                addWriters(scrapedData.getWriters());
+                scrapedData.getDirectors().ifPresent(this::addDirectors);
+                scrapedData.getWriters().ifPresent(this::addWriters);
             }
             textTitle.setText(currentMovie.getTitle());
             textCoverUrl.setText(currentMovie.getCoverUrl());
@@ -180,7 +181,6 @@ public class MovieController {
      * @author Grzegorz Lach
      * @since v0.0.1
      */
-    @SneakyThrows
     @FXML
     public void onBtnLoadDataAction() {
         ExternalFileParser efp = new ExternalFileParser();
@@ -204,93 +204,73 @@ public class MovieController {
                             imdbUrl = lineData.get(2).trim();
                         } else {
                             wasWatched = false;
-                            for(String data : lineData) {
-                                if(Movie.validateImdbLink(data)) {
+                            for (String data : lineData) {
+                                if (Movie.validateImdbLink(data)) {
                                     imdbUrl = data.trim();
                                 }
                             }
                         }
-                        if(imdbUrl.equalsIgnoreCase("")) {
-                            System.out.println("Problem While Parsing IMDB URL\t-\t" + line);
-                        }
-
-                        if (movieService.getMovieByImdbUrl(imdbUrl) == null) {
-                            MovieData scrapedData = ScraperUtility.scrapeData(imdbUrl);
-                            Movie movieToAdd = new Movie(imdbUrl, scrapedData);
-                            HashSet<Director> directorsToAdd = new HashSet<>();
-                            HashSet<Writer> writersToAdd = new HashSet<>();
-                            HashSet<Tag> tagsToAdd = new HashSet<>();
-                            HashSet<Genre> genresToAdd = new HashSet<>();
-                            for (String directorName : scrapedData.getDirectors()) {
-                                String n = ScraperUtility.formatToCamelCase(directorName);
-                                if (!directorService.existsByNameIgnoreCase(ScraperUtility.formatToCamelCase(directorName))) {
-                                    Director d = new Director(n);
-                                    directorService.save(d);
-                                    directorsToAdd.add(d);
-                                } else {
-                                    directorsToAdd.add(directorService.getDirectorByNameEqualsIgnoreCase(n));
-                                }
-                            }
-                            movieToAdd.setDirectors(directorsToAdd);
-                            for (String writerName : scrapedData.getWriters()) {
-                                String n = ScraperUtility.formatToCamelCase(writerName);
-                                if (!writerService.existsByNameIgnoreCase(n)) {
-                                    Writer w = new Writer(n);
-                                    writerService.save(w);
-                                    writersToAdd.add(w);
-                                } else {
-                                    writersToAdd.add(writerService.getWriterByNameEqualsIgnoreCase(n));
-                                }
-                            }
-                            movieToAdd.setWriters(writersToAdd);
-                            for(String genreName : scrapedData.getGenres()) {
-                                String n = ScraperUtility.formatToCamelCase(genreName);
-                                if(!genreService.existsByGenreName(n)) {
-                                    Genre g = new Genre(n);
-                                    genreService.save(g);
-                                    genresToAdd.add(g);
-                                } else {
-                                    genresToAdd.add(genreService.findGenreByGenreName(n));
-                                }
-                            }
-                            movieToAdd.setGenres(genresToAdd);
-                            for(String tagName : scrapedData.getTags()) {
-                                String n = ScraperUtility.formatToCamelCase(tagName);
-                                if(!tagService.existsByTagName(n)) {
-                                    Tag t = new Tag(n);
-                                    tagService.save(t);
-                                    tagsToAdd.add(t);
-                                } else {
-                                    tagsToAdd.add(tagService.findTagByTagName(n));
-                                }
-                            }
-                            movieToAdd.setTags(tagsToAdd);
-                            movieService.save(movieToAdd);
-                            System.out.println(movieToAdd);
-                            // Review
-                            if(wasWatched) {
-                                double rating = Double.parseDouble(lineData.get(1).trim());
-                                rating *= 10.0;
-                                Review r = new Review((int) rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
-                                reviewService.save(r);
-                            }
-                            Platform.runLater(() -> {
-                                textImdbLink.setText(movieToAdd.getImdbUrl());
-                                textTitle.setText(movieToAdd.getTitle());
-                                textLanguage.setText(movieToAdd.getLanguage());
-                                textCoverUrl.setText(movieToAdd.getCoverUrl());
-                                textRuntime.setText(movieToAdd.getRuntime());
-                                textCountryOfOrigin.setText(movieToAdd.getCountryOfOrigin());
-                                textReleaseDate.setText(movieToAdd.getReleaseDate());
-                                addDirectors(movieToAdd.getDirectors().stream().map(Director::getName).toList());
-                                addWriters(movieToAdd.getWriters().stream().map(Writer::getName).toList());
-                                FXUtility.changeImageViewContent(viewCoverImage, movieToAdd.getCoverUrl(), true);
-                            });
+                        if (imdbUrl.equalsIgnoreCase("")) {
+                            throw new ImdbLinkParsingException(line);
                         } else {
-                            // TODO: Add logic for movie for read already existing in db...
-                            System.out.println("Movie Already Exists In Database!!");
+                            if (movieService.getMovieByImdbUrl(imdbUrl) == null) {
+                                // Temp Collections
+                                HashSet<Director> directorsToAdd = new HashSet<>();
+                                HashSet<Writer> writersToAdd = new HashSet<>();
+                                HashSet<Tag> tagsToAdd = new HashSet<>();
+                                HashSet<Genre> genresToAdd = new HashSet<>();
+                                // Scrape Movie Data
+                                MovieData scrapedData = ScraperUtility.scrapeData(imdbUrl);
+                                Movie movieToAdd = new Movie(imdbUrl, scrapedData);
+                                // Verification Of Scraped Directors Data
+                                scrapedData.getDirectors()
+                                        .ifPresent(list ->
+                                                list.stream()
+                                                        .map(ScraperUtility::formatToCamelCase)
+                                                        .map(directorName -> directorService.findOrCreateNew(directorName))
+                                                        .forEach(director -> directorsToAdd.add(director)));
+                                movieToAdd.setDirectors(directorsToAdd);
+                                // Verification Of Scraped Writers Data
+                                scrapedData.getWriters()
+                                        .ifPresent(list ->
+                                                list.stream()
+                                                        .map(ScraperUtility::formatToCamelCase)
+                                                        .map(writerName -> writerService.findOrCreateNew(writerName))
+                                                        .forEach(writer -> writersToAdd.add(writer)));
+                                movieToAdd.setWriters(writersToAdd);
+                                // Verification Of Scraped Genres Data
+                                scrapedData.getGenres()
+                                        .ifPresent(list ->
+                                                list.stream()
+                                                        .map(ScraperUtility::formatToCamelCase)
+                                                        .map(genreName -> genreService.findOrCreateNew(genreName))
+                                                        .forEach(genre -> genresToAdd.add(genre)));
+                                movieToAdd.setGenres(genresToAdd);
+                                // Verification Of Scraped Tags Data
+                                scrapedData.getTags()
+                                        .ifPresent(list ->
+                                                list.stream()
+                                                        .map(ScraperUtility::formatToCamelCase)
+                                                        .map(tagName -> tagService.findOrCreateNew(tagName))
+                                                        .forEach(tag -> tagsToAdd.add(tag)));
+                                movieToAdd.setTags(tagsToAdd);
+                                // Saving Of Scraped Movie
+                                movieService.save(movieToAdd);
+                                // Creation Of Review Data
+                                if (wasWatched) {
+                                    double rating = Double.parseDouble(lineData.get(1).trim());
+                                    rating *= 10.0;
+                                    Review r = new Review((int) rating, lineData.get(3).trim(), ZonedDateTime.now(), movieToAdd);
+                                    reviewService.save(r);
+                                }
+                                // Refresh Displayed Information
+                                updateDisplayedInformation(movieToAdd);
+                            } else {
+                                // TODO: Add logic for movie for read already existing in db...
+                                System.out.println("Movie Already Exists In Database!!");
+                            }
+                            System.out.println("Movie With Link:\t" + imdbUrl + " Already Exists In Database!");
                         }
-                        System.out.println("Movie With Link:\t" + imdbUrl + " Already Exists In Database!");
                     }
                 } catch (IOException ex) {
                     // TODO: Add exception handling...
@@ -305,6 +285,21 @@ public class MovieController {
         }
     }
 
+    private void updateDisplayedInformation(Movie movie) {
+        Platform.runLater(() -> {
+            textImdbLink.setText(movie.getImdbUrl());
+            textTitle.setText(movie.getTitle());
+            textLanguage.setText(movie.getLanguage());
+            textCoverUrl.setText(movie.getCoverUrl());
+            textRuntime.setText(movie.getRuntime());
+            textCountryOfOrigin.setText(movie.getCountryOfOrigin());
+            textReleaseDate.setText(movie.getReleaseDate());
+            addDirectors(movie.getDirectors().stream().map(Director::getName).toList());
+            addWriters(movie.getWriters().stream().map(Writer::getName).toList());
+            FXUtility.changeImageViewContent(viewCoverImage, movie.getCoverUrl(), true);
+        });
+    }
+
     /**
      * @author Grzegorz Lach
      * @since v0.0.1
@@ -313,6 +308,9 @@ public class MovieController {
     public void onBtnSaveDataAction() {
         //TODO: Refactor Method
         if(currentMovie != null && currentMovie.getImdbUrl().length() > 0) {
+            if(movieService.existsById(currentMovie.getMovieID())) {
+
+            }
             currentMovie.setDirectors(obtainCurrentDirectors());
             currentMovie.setWriters(obtainCurrentWriters());
             Set<Genre> genres = currentMovie.getGenres();

@@ -1,6 +1,6 @@
 package com.souryuu.catalogit.repository;
 
-import com.souryuu.catalogit.entity.Genre;
+import com.souryuu.catalogit.entity.database.Genre;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

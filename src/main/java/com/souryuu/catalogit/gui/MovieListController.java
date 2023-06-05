@@ -1,9 +1,9 @@
 package com.souryuu.catalogit.gui;
 
-import com.souryuu.catalogit.entity.Director;
-import com.souryuu.catalogit.entity.Movie;
-import com.souryuu.catalogit.entity.Review;
-import com.souryuu.catalogit.entity.Writer;
+import com.souryuu.catalogit.entity.database.Director;
+import com.souryuu.catalogit.entity.database.Movie;
+import com.souryuu.catalogit.entity.database.Review;
+import com.souryuu.catalogit.entity.database.Writer;
 import com.souryuu.catalogit.exception.ViewLoadException;
 import com.souryuu.catalogit.service.MovieService;
 import com.souryuu.catalogit.service.ReviewService;
@@ -26,7 +26,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
-import javafx.util.Callback;
 import lombok.*;
 import net.rgielen.fxweaver.core.FxWeaver;
 import net.rgielen.fxweaver.core.FxmlView;
@@ -36,7 +35,6 @@ import org.springframework.stereotype.Component;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -157,7 +155,6 @@ public class MovieListController {
                 long idCriteria = Long.parseLong(valueString);
                 currentMovieList = movieService.findAllByIdWithReviews(idCriteria);
             } catch (NumberFormatException ex) {
-//                ex.printStackTrace();
                 DialogUtility.createErrorDialog("Niepoprawna Wartość ID", "Wprowadzona wartość: " +
                         fieldSearch.getText() + " nie jest poprawną wartością dla pola ID!");
             } finally {

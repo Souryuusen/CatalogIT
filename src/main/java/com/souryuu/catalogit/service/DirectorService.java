@@ -1,8 +1,9 @@
 package com.souryuu.catalogit.service;
 
-import com.souryuu.catalogit.entity.Director;
-import com.souryuu.catalogit.entity.Movie;
+import com.souryuu.catalogit.entity.database.Director;
+import com.souryuu.catalogit.entity.database.Movie;
 import com.souryuu.catalogit.repository.DirectorRepository;
+import com.souryuu.catalogit.utility.ScraperUtility;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,14 @@ public class DirectorService {
     public DirectorService(DirectorRepository repository) {
         this.repository = repository;
     }
+
+    //##################################################################################################################
+
+    public Director findOrCreateNew(String name) {
+        return (!existsByNameIgnoreCase(name)) ? save(new Director(name)) : getDirectorByNameEqualsIgnoreCase(name);
+    }
+
+    //##################################################################################################################
 
     public Director save(Director director) {
         return this.repository.save(director);

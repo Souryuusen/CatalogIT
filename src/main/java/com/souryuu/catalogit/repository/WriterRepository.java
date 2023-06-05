@@ -1,7 +1,7 @@
 package com.souryuu.catalogit.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.souryuu.catalogit.entity.Writer;
+import com.souryuu.catalogit.entity.database.Writer;
 import org.springframework.stereotype.Repository;
 
 @Repository

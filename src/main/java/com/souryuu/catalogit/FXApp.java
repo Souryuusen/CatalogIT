@@ -15,7 +15,7 @@ public class FXApp extends Application {
     private ConfigurableApplicationContext context;
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         this.context.publishEvent(new StageReadyEvent(primaryStage));
     }
 

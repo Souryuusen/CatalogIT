@@ -1,6 +1,6 @@
 package com.souryuu.catalogit.service;
 
-import com.souryuu.catalogit.entity.Review;
+import com.souryuu.catalogit.entity.database.Review;
 import com.souryuu.catalogit.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;

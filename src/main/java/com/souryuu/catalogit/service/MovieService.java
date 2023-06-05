@@ -1,7 +1,6 @@
 package com.souryuu.catalogit.service;
 
-import com.souryuu.catalogit.entity.Movie;
-import com.souryuu.catalogit.entity.Writer;
+import com.souryuu.catalogit.entity.database.Movie;
 import com.souryuu.catalogit.repository.MovieRepository;
 import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
@@ -68,6 +67,8 @@ public class MovieService {
         Hibernate.initialize(movie.getDirectors());
         Hibernate.initialize(movie.getWriters());
         Hibernate.initialize(movie.getReviews());
+        Hibernate.initialize(movie.getGenres());
+        Hibernate.initialize(movie.getTags());
         return movie;
     }
 
@@ -90,6 +91,8 @@ public class MovieService {
         Hibernate.initialize(movie.getDirectors());
         Hibernate.initialize(movie.getWriters());
         Hibernate.initialize(movie.getReviews());
+        Hibernate.initialize(movie.getGenres());
+        Hibernate.initialize(movie.getTags());
         return movie;
     }
 
