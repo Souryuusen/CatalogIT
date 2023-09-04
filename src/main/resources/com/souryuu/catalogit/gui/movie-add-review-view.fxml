@@ -12,7 +12,7 @@
 
 <AnchorPane fx:id="addReviewRoot"
             prefHeight="225.0" prefWidth="300.0"
-            stylesheets="@movie-edit-director-view.css"
+            stylesheets="@movie-edit-review-view.css"
             xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.souryuu.catalogit.gui.MovieController">
    <children>

@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="root" maxHeight="665.0" maxWidth="1100.0" minHeight="665.0" minWidth="1100.0" prefHeight="665.0" prefWidth="1100.0" stylesheets="@movie-add-new-view.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.souryuu.catalogit.gui.MovieController">
+   <StackPane fx:id="paneCover" layoutX="830.0" layoutY="14.0" maxHeight="344.0" maxWidth="255.0" minHeight="344.0" minWidth="255.0" prefHeight="344.0" prefWidth="255.0" AnchorPane.bottomAnchor="314.0" AnchorPane.leftAnchor="840.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+      <children>
+         <ImageView fx:id="viewCoverImage" fitHeight="333.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
+            <viewport>
+               <Rectangle2D />
+            </viewport>
+         </ImageView>
+      </children>
+   </StackPane>
+   <Label fx:id="labelHeader" alignment="CENTER" layoutX="10.0" layoutY="10.0" minWidth="820.0" prefHeight="35.0" prefWidth="822.0" text="Dodaj Nowy Film" textAlignment="CENTER" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="262.0" AnchorPane.topAnchor="5.0">
+      <font>
+         <Font size="24.0" />
+      </font>
+   </Label>
+   <VBox alignment="TOP_CENTER" layoutX="35.0" layoutY="69.0" maxHeight="304.0" minHeight="304.0" prefHeight="304.0" prefWidth="100.0" AnchorPane.bottomAnchor="314.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="262.0" AnchorPane.topAnchor="51.0">
+      <children>
+         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="IMDB Link" textAlignment="CENTER">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textImdbLink" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0" HBox.hgrow="NEVER">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </HBox>
+         <HBox alignment="CENTER" layoutX="10.0" layoutY="10.0" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="Tytuł">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textTitle" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </HBox>
+         <HBox alignment="CENTER" layoutX="10.0" layoutY="110.0" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="Data Wydania">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textReleaseDate" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </HBox>
+         <HBox alignment="CENTER" layoutX="10.0" layoutY="205.0" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="Kraj Produkcji">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textCountryOfOrigin" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </HBox>
+         <HBox alignment="CENTER" layoutX="10.0" layoutY="229.0" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="Czas Trwania">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textRuntime" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </HBox>
+         <HBox alignment="CENTER" layoutX="10.0" layoutY="244.0" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="Język">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textLanguage" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+            <VBox.margin>
+               <Insets bottom="5.0" />
+            </VBox.margin>
+         </HBox>
+         <HBox alignment="CENTER" layoutX="10.0" layoutY="254.0" prefHeight="100.0" prefWidth="200.0">
+            <children>
+               <Label alignment="CENTER" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0" text="Okładka Link">
+                  <font>
+                     <Font size="18.0" />
+                  </font>
+               </Label>
+               <TextField fx:id="textCoverUrl" maxHeight="30.0" maxWidth="615.0" minHeight="30.0" minWidth="615.0" prefHeight="30.0" prefWidth="615.0">
+                  <HBox.margin>
+                     <Insets left="5.0" right="5.0" />
+                  </HBox.margin>
+               </TextField>
+            </children>
+         </HBox>
+      </children>
+   </VBox>
+   <HBox layoutX="383.0" layoutY="477.0" prefHeight="100.0" prefWidth="200.0" spacing="5.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="352.0">
+      <children>
+         <AnchorPane fx:id="detailPane" prefHeight="225.0" prefWidth="363.0">
+            <HBox.margin>
+               <Insets left="5.0" right="5.0" />
+            </HBox.margin>
+         </AnchorPane>
+         <AnchorPane fx:id="editDirectorRoot" prefHeight="225.0" prefWidth="300.0">
+            <children>
+               <HBox fx:id="hAddNewDirector" alignment="CENTER" maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="363.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                  <children>
+                     <Label fx:id="labelAddNewDirector" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" text="Dodaj:" />
+                     <TextField fx:id="textNewDirectorName" maxHeight="30.0" maxWidth="175.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="175.0" promptText="Imię nowego reżysera...">
+                        <HBox.margin>
+                           <Insets left="10.0" right="10.0" />
+                        </HBox.margin>
+                     </TextField>
+                     <Button fx:id="btnAddNewDirector" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#onBtnAddNewDirectorAction" prefHeight="30.0" prefWidth="90.0" text="Dodaj" />
+                  </children>
+               </HBox>
+               <HBox fx:id="hRemoveDirector" alignment="CENTER" layoutX="8.0" layoutY="190.0" maxHeight="40.0" maxWidth="363.0" minHeight="40.0" minWidth="363.0" prefHeight="40.0" prefWidth="363.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <children>
+                     <Label fx:id="labelRemoveDirector" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" text="Usuń:">
+                        <HBox.margin>
+                           <Insets bottom="2.0" />
+                        </HBox.margin>
+                     </Label>
+                     <ComboBox fx:id="comboRemoveDirector" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0">
+                        <HBox.margin>
+                           <Insets bottom="2.0" left="10.0" right="10.0" />
+                        </HBox.margin>
+                     </ComboBox>
+                     <Button fx:id="btnRemoveDirector" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#onBtnRemoveDirectorAction" prefHeight="30.0" prefWidth="90.0" text="Usuń">
+                        <HBox.margin>
+                           <Insets bottom="2.0" />
+                        </HBox.margin>
+                     </Button>
+                  </children>
+               </HBox>
+               <StackPane layoutX="50.0" layoutY="67.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0">
+                  <children>
+                     <TableView fx:id="tableAddedDirectors" prefHeight="190.0" prefWidth="300.0">
+                        <columns>
+                           <TableColumn fx:id="columnAddedDirectorsID" editable="false" prefWidth="50.0" text="ID" />
+                           <TableColumn fx:id="columnAddedDirectorsName" editable="false" prefWidth="306.0" text="Reżyser" />
+                        </columns>
+                     </TableView>
+                  </children>
+               </StackPane>
+            </children>
+         </AnchorPane>
+         <AnchorPane fx:id="editWriterRoot" prefHeight="225.0" prefWidth="300.0">
+            <children>
+               <HBox fx:id="hAddNewDirector1" alignment="CENTER" maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="363.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+                  <children>
+                     <Label fx:id="labelAddNewWriter" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" text="Dodaj:" />
+                     <TextField fx:id="textNewWriterName" maxHeight="30.0" maxWidth="175.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="175.0" promptText="Imię nowego scenarzysty...">
+                        <HBox.margin>
+                           <Insets left="10.0" right="10.0" />
+                        </HBox.margin>
+                     </TextField>
+                     <Button fx:id="btnAddNewWriter" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#onBtnAddNewWriterAction" prefHeight="30.0" prefWidth="90.0" text="Dodaj" />
+                  </children>
+               </HBox>
+               <HBox fx:id="hRemoveDirector1" alignment="CENTER" layoutX="8.0" layoutY="190.0" maxHeight="40.0" maxWidth="363.0" minHeight="40.0" minWidth="363.0" prefHeight="40.0" prefWidth="363.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                  <children>
+                     <Label fx:id="labelRemoveDirector1" maxHeight="30.0" minHeight="30.0" prefHeight="30.0" text="Usuń:">
+                        <HBox.margin>
+                           <Insets bottom="2.0" />
+                        </HBox.margin>
+                     </Label>
+                     <ComboBox fx:id="comboRemoveWriter" maxHeight="30.0" maxWidth="200.0" minHeight="30.0" minWidth="200.0" prefHeight="30.0" prefWidth="200.0">
+                        <HBox.margin>
+                           <Insets bottom="2.0" left="10.0" right="10.0" />
+                        </HBox.margin>
+                     </ComboBox>
+                     <Button fx:id="btnRemoveWriter" maxHeight="30.0" maxWidth="90.0" minHeight="30.0" minWidth="90.0" mnemonicParsing="false" onAction="#onBtnRemoveWriterAction" prefHeight="30.0" prefWidth="90.0" text="Usuń">
+                        <HBox.margin>
+                           <Insets bottom="2.0" />
+                        </HBox.margin>
+                     </Button>
+                  </children>
+               </HBox>
+               <StackPane layoutX="50.0" layoutY="67.0" prefHeight="150.0" prefWidth="200.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0">
+                  <children>
+                     <TableView fx:id="tableAddedWriters" prefHeight="190.0" prefWidth="300.0">
+                        <columns>
+                           <TableColumn fx:id="columnAddedWritersID" editable="false" prefWidth="50.0" text="ID" />
+                           <TableColumn fx:id="columnAddedWritersName" editable="false" prefWidth="306.0" text="Scenarzysta" />
+                        </columns>
+                     </TableView>
+                  </children>
+               </StackPane>
+            </children>
+         </AnchorPane>
+      </children>
+   </HBox>
+   <Button fx:id="btnScrapeData" layoutX="378.0" layoutY="646.0" mnemonicParsing="false" onAction="#onBtnScrapeDataAction" prefHeight="30.0" prefWidth="90.0" text="Pobierz Dane" />
+   <Button fx:id="btnLoadData" layoutX="476.0" layoutY="649.0" mnemonicParsing="false" onAction="#onBtnLoadDataAction" prefHeight="30.0" prefWidth="90.0" text="Wczytaj Dane" />
+   <Button fx:id="btnSaveData" layoutX="569.0" layoutY="652.0" mnemonicParsing="false" onAction="#onBtnSaveDataAction" prefHeight="30.0" prefWidth="90.0" text="Zapisz" />
+   <Button fx:id="btnAddNewReview" layoutX="673.0" layoutY="646.0" mnemonicParsing="false" onAction="#onBtnAddNewReviewAction" prefHeight="30.0" prefWidth="145.0" text="Dodaj Nową Recenzję" AnchorPane.leftAnchor="673.0" AnchorPane.topAnchor="646.0" />
+   <Button fx:id="btnEditReview" layoutX="787.0" layoutY="644.0" mnemonicParsing="false" onAction="#onBtnEditReviewAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Recenzje" AnchorPane.leftAnchor="787.0" AnchorPane.topAnchor="644.0" />
+</AnchorPane>

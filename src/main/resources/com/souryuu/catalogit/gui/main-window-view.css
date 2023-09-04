@@ -1,0 +1,30 @@
+#root {
+    -fx-background-color: #212121;
+}
+
+#controlRoot {
+    -fx-border-style: solid;
+    -fx-border-color: #616161;
+    -fx-border-radius: 5;
+    -fx-border-width: 2px;
+    -fx-background-color: #424242;
+}
+
+#contentRoot {
+    -fx-border-style: solid;
+    -fx-border-color: #616161;
+    -fx-border-radius: 5;
+    -fx-background-color: #424242;
+    -fx-border-width: 2px;
+}
+
+Button {
+    -fx-background-color: #607D8B;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+}
+
+Button:hover {
+    -fx-border-color: #CFD8DC;
+    -fx-background-color: #90A4AE;
+}
