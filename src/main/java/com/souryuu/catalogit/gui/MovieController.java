@@ -71,6 +71,7 @@ public class MovieController {
     @FXML HBox hRemoveDirector;
     @FXML HBox hAddNewWriter;
     @FXML HBox hRemoveWriter;
+    @FXML HBox hReviewActionBox;
 
     @FXML Label labelEditedReviewIndex;
     @FXML Label labelEditedReviewCreation;

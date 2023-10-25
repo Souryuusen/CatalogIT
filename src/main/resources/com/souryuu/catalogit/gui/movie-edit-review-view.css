@@ -1,3 +1,53 @@
 AnchorPane {
-    -fx-background-color: White;
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #757575;
+}
+
+TextArea{
+    -fx-background-color: #CFD8DC;
+    -fx-background-radius: 5px;
+    -fx-border-style: solid;
+    -fx-border-color: #757575;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1;
+}
+
+Label {
+    -fx-text-fill: #E0E0E0;
+}
+
+Button {
+    -fx-background-color: #607D8B;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: #CFD8DC;
+}
+
+Button:hover {
+    -fx-border-color: #CFD8DC;
+    -fx-background-color: #90A4AE;
+}
+
+.slider .track {
+    -fx-background-color: #607D8B;
+    -fx-background-insets: 0 0 -1 0, 0, 1;
+    -fx-background-radius: 0.25em, 0.25em, 0.166667em; /* 3 3 2 */
+    -fx-padding: 0.25em; /* 3 */
+}
+
+.slider .thumb {
+    -fx-background-color: LightSkyBlue;
+}
+
+.slider .axis:bottom {
+    -fx-tick-label-fill: #CFD8DC;
+}
+
+.text-area .content {
+    -fx-background-color: #CFD8DC;
 }

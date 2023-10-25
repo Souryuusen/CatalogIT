@@ -49,6 +49,16 @@ HBox AnchorPane HBox {
     -fx-border-color: #757575;
 }
 
+HBox AnchorPane AnchorPane {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #757575;
+}
+
 .table-view {
     -fx-alignment: CENTER;
     -fx-text-alignment: CENTER;
