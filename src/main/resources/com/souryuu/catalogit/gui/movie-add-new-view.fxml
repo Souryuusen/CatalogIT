@@ -163,7 +163,7 @@
                      <Button fx:id="btnEditReview" mnemonicParsing="false" onAction="#onBtnEditReviewAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Recenzje" />
                   </children>
                </HBox>
-               <AnchorPane layoutX="75.0" layoutY="60.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0" />
+               <AnchorPane fx:id="detailPane" layoutX="75.0" layoutY="60.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0" />
             </children>
          </AnchorPane>
          <AnchorPane fx:id="editDirectorRoot" prefHeight="225.0" prefWidth="300.0">
