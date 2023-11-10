@@ -129,3 +129,13 @@ Button:hover {
     -fx-border-color: #CFD8DC;
     -fx-background-color: #90A4AE;
 }
+
+HBox AnchorPane VBox {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #757575;
+}

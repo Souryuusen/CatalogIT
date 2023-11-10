@@ -7,6 +7,8 @@ import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -94,6 +96,22 @@ public class MovieService {
         Hibernate.initialize(movie.getGenres());
         Hibernate.initialize(movie.getTags());
         return movie;
+    }
+
+    public Set<Movie> getAllMovies() {
+        return this.repository.findAll().stream().collect(Collectors.toSet());
+    }
+
+    public Set<Movie> getAllMoviesWithInitialization() {
+        Set<Movie> moviesSet = this.repository.findAll().stream().collect(Collectors.toSet());
+        for(Movie m : moviesSet) {
+            Hibernate.initialize(m.getDirectors());
+            Hibernate.initialize(m.getWriters());
+            Hibernate.initialize(m.getReviews());
+            Hibernate.initialize(m.getGenres());
+            Hibernate.initialize(m.getTags());
+        }
+        return moviesSet;
     }
 
     public boolean deleteMovieById(long id) {

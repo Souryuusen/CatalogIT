@@ -8,8 +8,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Entity
 @Table(name = "MOVIES")
@@ -144,6 +144,62 @@ public class Movie{
         return getTags().remove(tag);
     }
 
+    /**
+     * @author  Grzegorz Lach
+     * @since v0.0.2
+     * @return Summary of object fields values for export to *.txt feature
+     */
+    public String createExportSummary() {
+        StringBuilder sb = new StringBuilder();
+        // Movie Title
+        sb.append(getTitle() + "\n");
+        // Movie IMDB Url
+        sb.append("\tURL: " + getImdbUrl() + "\n");
+        // Movie Cover URL
+        sb.append("\tCover URL: " + getCoverUrl() + "\n");
+        // Movie Meta-Info
+        sb.append("\tDetails: " + getRuntime() + ", " + getReleaseDate() + ", " + getCountryOfOrigin());
+        // Movie Genre
+        sb.append("\n\tGenre: ");
+        var genreList = getGenres().stream().toList();
+        for(int i = 0; i < genreList.size(); i++) {
+            sb.append(genreList.get(i).getGenreName());
+            if (i != genreList.size() - 1) sb.append(", ");
+        }
+        // Movie Tags
+        sb.append("\n\tTags: ");
+        var tagList = getTags().stream().toList();
+        for(int i = 0; i < tagList.size(); i++) {
+            sb.append(tagList.get(i).getTagName());
+            if (i != tagList.size()-1) sb.append(", ");
+        }
+        // Movie Writers
+        sb.append("\n\tWriters: ");
+        var writerList = getWriters().stream().toList();
+        for(int i = 0; i < writerList.size(); i++) {
+            sb.append(writerList.get(i).getName());
+            if (i != writerList.size()-1) sb.append(", ");
+        }
+        // Movie Directors
+        sb.append("\n\tDirectors: ");
+        var directorList = getDirectors().stream().toList();
+        for(int i = 0; i < directorList.size(); i++) {
+            sb.append(directorList.get(i).getName());
+            if (i != directorList.size()-1) sb.append(", ");
+        }
+        // Movie Reviews
+        sb.append("\n\tReviews:\n");
+        var reviewList = getReviews().stream().toList();
+        for(int i = 0; i < reviewList.size(); i++) {
+            Review r = reviewList.get(i);
+            sb.append("\t\tReview #" + (i+1) + ": "
+                    + r.getCreationData().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss nnnn"))
+                        + ", Rating: " + (r.getRating()/10.0) + "\n");
+            sb.append("\t\t\t" + "\"" + r.getReview() + "\"\n");
+        }
+        return sb.toString();
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -267,5 +323,25 @@ public class Movie{
             return this;
         }
 
+    }
+
+    public static class MovieIdComparator implements Comparator<Movie> {
+        @Override
+        public int compare(Movie o1, Movie o2) {
+            return (int) (o1.getMovieID() - o2.getMovieID());
+        }
+    }
+
+    public static class MovieTitleComparator implements Comparator<Movie> {
+        @Override
+        public int compare(Movie o1, Movie o2) {
+            if( o1.getTitle().equals(o2.getTitle()) )
+                return 0;
+            if( o1.getTitle() == null)
+                return 1;
+            if( o2.getTitle() == null )
+                return -1;
+            return o1.getTitle().compareTo(o2.getTitle());
+        }
     }
 }

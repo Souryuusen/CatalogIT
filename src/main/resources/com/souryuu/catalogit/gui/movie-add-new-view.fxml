@@ -157,13 +157,17 @@
                <Insets />
             </HBox.margin>
             <children>
-               <HBox fx:id="hReviewActionBox" alignment="CENTER" maxHeight="40.0" minHeight="40.0" prefHeight="40.0" prefWidth="363.0" spacing="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+               <VBox alignment="TOP_CENTER" prefHeight="200.0" prefWidth="100.0" spacing="15.0" AnchorPane.bottomAnchor="5.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
                   <children>
-                     <Button fx:id="btnAddNewReview" mnemonicParsing="false" onAction="#onBtnAddNewReviewAction" prefHeight="30.0" prefWidth="145.0" text="Dodaj Nową Recenzję" />
-                     <Button fx:id="btnEditReview" mnemonicParsing="false" onAction="#onBtnEditReviewAction" prefHeight="30.0" prefWidth="145.0" text="Edytuj Recenzje" />
+                     <Button fx:id="btnScrapeData" mnemonicParsing="false" onAction="#onBtnScrapeDataAction" prefHeight="30.0" prefWidth="300.0" text="Pobierz Dane Z Linku">
+                        <VBox.margin>
+                           <Insets top="5.0" />
+                        </VBox.margin>
+                     </Button>
+                     <Button fx:id="btnLoadData" mnemonicParsing="false" onAction="#onBtnLoadDataAction" prefHeight="30.0" prefWidth="300.0" text="Wczytaj Dane Z Pliku Tekstowego" />
+                     <Button fx:id="btnSaveData" mnemonicParsing="false" onAction="#onBtnSaveDataAction" prefHeight="30.0" prefWidth="300.0" text="Zapisz Film Do Bazy Danych" />
                   </children>
-               </HBox>
-               <AnchorPane fx:id="detailPane" layoutX="75.0" layoutY="60.0" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="55.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="55.0" />
+               </VBox>
             </children>
          </AnchorPane>
          <AnchorPane fx:id="editDirectorRoot" prefHeight="225.0" prefWidth="300.0">
@@ -256,7 +260,4 @@
          </AnchorPane>
       </children>
    </HBox>
-   <Button fx:id="btnScrapeData" layoutX="7.0" layoutY="667.0" mnemonicParsing="false" onAction="#onBtnScrapeDataAction" prefHeight="30.0" prefWidth="90.0" text="Pobierz Dane" />
-   <Button fx:id="btnLoadData" layoutX="106.0" layoutY="667.0" mnemonicParsing="false" onAction="#onBtnLoadDataAction" prefHeight="30.0" prefWidth="90.0" text="Wczytaj Dane" />
-   <Button fx:id="btnSaveData" layoutX="206.0" layoutY="667.0" mnemonicParsing="false" onAction="#onBtnSaveDataAction" prefHeight="30.0" prefWidth="90.0" text="Zapisz" />
 </AnchorPane>

@@ -62,17 +62,17 @@
             </ScrollPane>
          </children>
       </HBox>
-      <HBox alignment="CENTER"
-            layoutX="10.0" layoutY="161.0"
-            prefHeight="30.0" prefWidth="280.0"
-            AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
-            AnchorPane.topAnchor="165.0">
-         <children>
-            <Button fx:id="btnAddReview"
-                    onAction="#onBtnAddReviewAction"
-                    prefHeight="30.0" prefWidth="150.0"
-                    text="Dodaj Recenzję" textAlignment="CENTER" />
-         </children>
-      </HBox>
+<!--      <HBox alignment="CENTER"-->
+<!--            layoutX="10.0" layoutY="161.0"-->
+<!--            prefHeight="30.0" prefWidth="280.0"-->
+<!--            AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"-->
+<!--            AnchorPane.topAnchor="165.0">-->
+<!--         <children>-->
+<!--            <Button fx:id="btnAddReview"-->
+<!--                    onAction="#onBtnAddReviewAction"-->
+<!--                    prefHeight="30.0" prefWidth="150.0"-->
+<!--                    text="Dodaj Recenzję" textAlignment="CENTER" />-->
+<!--         </children>-->
+<!--      </HBox>-->
    </children>
 </AnchorPane>

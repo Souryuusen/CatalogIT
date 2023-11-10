@@ -28,6 +28,7 @@
             <menus>
                 <Menu fx:id="menuFile" text="File">
                     <items>
+                  <MenuItem fx:id="menuItemExportToTxt" mnemonicParsing="false" onAction="#onBtnExportToTxtAction" text="Eksport Do *.Txt" />
                         <MenuItem fx:id="menuItemClose" onAction="#onMenuItemCloseAction" text="Close" />
                     </items>
                 </Menu>

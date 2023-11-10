@@ -4,7 +4,6 @@ import com.souryuu.catalogit.entity.application.MovieData;
 import com.souryuu.catalogit.entity.database.*;
 import com.souryuu.catalogit.entity.database.Writer;
 import com.souryuu.catalogit.exception.ImdbLinkParsingException;
-import com.souryuu.catalogit.exception.ViewLoadException;
 import com.souryuu.catalogit.service.*;
 import com.souryuu.catalogit.utility.DialogUtility;
 import com.souryuu.catalogit.utility.ExternalFileParser;
@@ -16,10 +15,7 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.ImageView;
@@ -33,7 +29,6 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,9 +64,6 @@ public class MovieController {
     @FXML HBox hWriters;
     @FXML HBox hAddNewDirector;
     @FXML HBox hRemoveDirector;
-    @FXML HBox hAddNewWriter;
-    @FXML HBox hRemoveWriter;
-    @FXML HBox hReviewActionBox;
 
     @FXML Label labelEditedReviewIndex;
     @FXML Label labelEditedReviewCreation;
@@ -97,8 +89,6 @@ public class MovieController {
     @FXML Button btnRemoveDirector;
     @FXML Button btnAddNewWriter;
     @FXML Button btnRemoveWriter;
-    @FXML Button btnAddReview;
-    @FXML Button btnEditReview;
     @FXML Button btnEditedReviewPrevious;
     @FXML Button btnEditedReviewSave;
     @FXML Button btnEditedReviewNext;
@@ -117,9 +107,7 @@ public class MovieController {
     @FXML TableView<Writer> tableAddedWriters;
 
     @FXML TableColumn<Director, Long> columnDirectorsID;
-    @FXML TableColumn<Director, String> columnDirectorsName;
     @FXML TableColumn<Writer, Long> columnWritersID;
-    @FXML TableColumn<Writer, String> columnWritersName;
     @FXML TableColumn<Director, Long> columnAddedDirectorsID;
     @FXML TableColumn<Director, String> columnAddedDirectorsName;
     @FXML TableColumn<Writer, Long> columnAddedWritersID;
@@ -157,7 +145,7 @@ public class MovieController {
             String movieImdbLink = textImdbLink.getText().trim().toLowerCase();
             // Cleaning Of Tables
             tableAddedDirectors.getItems().clear();
-
+            tableAddedWriters.getItems().clear();
             // Verification If Movie With This URL Exists In DB
             currentMovie = movieService.getMovieByImdbUrl(movieImdbLink);
             if(currentMovie != null && currentMovie.getImdbUrl().equalsIgnoreCase(movieImdbLink)) {
@@ -352,7 +340,7 @@ public class MovieController {
             currentMovie.setGenres(genreToAdd);
             currentMovie.setTags(tagToAdd);
             movieService.save(currentMovie);
-            currentMovie.setReviews(obtainCurrentReviews());
+//            currentMovie.setReviews(obtainCurrentReviews());
             movieService.save(currentMovie);
         }
     }
@@ -397,11 +385,11 @@ public class MovieController {
         // Filling ComboBox Data From
         comboRemoveDirector.setItems(FXCollections.observableList(currentDirectorNames).sorted());
         // Filling TableView With Database Entries
-        tableDirectors.getItems().clear();
-        tableDirectors.setItems(FXCollections.observableList(directorService.findDirectorsOfMovie(currentMovie)));
+        tableAddedDirectors.getItems().clear();
+        tableAddedDirectors.setItems(FXCollections.observableList(directorService.findDirectorsOfMovie(currentMovie)));
         // Sorting Table By Director ID Field
-        tableDirectors.getSortOrder().add(columnDirectorsID);
-        tableDirectors.sort();
+        tableAddedDirectors.getSortOrder().add(columnAddedDirectorsID);
+        tableAddedDirectors.sort();
     }
 
     private void displayAddedMovieWriters() {
@@ -416,8 +404,8 @@ public class MovieController {
         tableAddedWriters.getItems().clear();
         tableAddedWriters.setItems(FXCollections.observableList(writerService.findAll()));
         // Sorting Table By Director ID Field
-        tableDirectors.getSortOrder().add(columnDirectorsID);
-        tableDirectors.sort();
+        tableAddedWriters.getSortOrder().add(columnAddedWritersID);
+        tableAddedWriters.sort();
     }
 
     @FXML
@@ -452,6 +440,10 @@ public class MovieController {
             Director directorToRemove = new Director(comboRemoveDirector.getSelectionModel().getSelectedItem());
             // Parsing Current Directors List
             HashSet<Director> currentDirectors = (HashSet<Director>)obtainCurrentDirectors();
+            // Remove Director From TableView
+            if(tableAddedDirectors.getItems().contains(directorToRemove)) {
+                tableAddedDirectors.getItems().remove(directorToRemove);
+            }
             boolean removed = currentDirectors.remove(directorToRemove);
             if(removed) {
                 List<String> addedDirectorNames = currentDirectors.stream().map(Director::getName).collect(Collectors.toList());
@@ -498,6 +490,10 @@ public class MovieController {
             Writer writerToRemove = new Writer(comboRemoveWriter.getSelectionModel().getSelectedItem());
             // Parsing Current Directors List
             HashSet<Writer> currentWriters = (HashSet<Writer>)obtainCurrentWriters();
+            // Remove Writer From TableView
+            if(tableAddedWriters.getItems().contains(writerToRemove)) {
+                tableAddedWriters.getItems().remove(writerToRemove);
+            }
             boolean removed = currentWriters.remove(writerToRemove);
             if(removed) {
                 List<String> addedWritersNames = currentWriters.stream().map(Writer::getName).collect(Collectors.toList());
@@ -513,98 +509,99 @@ public class MovieController {
      * @author Grzegorz Lach
      * @since v0.0.1
      */
-    @FXML
-    public void onBtnAddNewReviewAction() {
-        // Setting New Content To Display On detailsPane
-        detailPane.getChildren().clear();
-        Optional<Node> viewOptional = fxWeaver.load(MovieAddReviewController.class).getView();
-        if(viewOptional.isPresent()) {
-            Node newContent = viewOptional.get();
-            detailPane.getChildren().setAll(newContent);
-        } else {
-            throw new ViewLoadException("Error Loading View From MovieAddReviewController Class!!");
-        }
-    }
+//    @FXML
+//    public void onBtnAddNewReviewAction() {
+//        // Setting New Content To Display On detailsPane
+//        detailPane.getChildren().clear();
+//        Optional<Node> viewOptional = fxWeaver.load(MovieAddReviewController.class).getView();
+//        if(viewOptional.isPresent()) {
+//            Node newContent = viewOptional.get();
+//            detailPane.getChildren().setAll(newContent);
+//            System.out.println(detailPane.styleProperty().getValue());
+//        } else {
+//            throw new ViewLoadException("Error Loading View From MovieAddReviewController Class!!");
+//        }
+//    }
 
-    @FXML
-    public void onBtnAddReviewAction() {
-        if(currentMovie != null && areaReviewBody.getText().trim().length() > 0) {
-            int rating = (int)(sliderReviewRating.getValue()*10);
-            String reviewBody = areaReviewBody.getText().trim();
-            ZonedDateTime now = ZonedDateTime.now();
-            Review newReview = new Review(rating, reviewBody, now, currentMovie);
-            currentReviews.add(newReview);
-            sliderReviewRating.setValue(5);
-            areaReviewBody.clear();
-            detailPane.getChildren().clear();
-        }
-    }
+//    @FXML
+//    public void onBtnAddReviewAction() {
+//        if(currentMovie != null && areaReviewBody.getText().trim().length() > 0) {
+//            int rating = (int)(sliderReviewRating.getValue()*10);
+//            String reviewBody = areaReviewBody.getText().trim();
+//            ZonedDateTime now = ZonedDateTime.now();
+//            Review newReview = new Review(rating, reviewBody, now, currentMovie);
+//            currentReviews.add(newReview);
+//            sliderReviewRating.setValue(5);
+//            areaReviewBody.clear();
+//            detailPane.getChildren().clear();
+//        }
+//    }
 
-    @FXML
-    public void onBtnEditReviewAction() {
-        // Setting New Content To Display On detailsPane
-        detailPane.getChildren().clear();
-        Optional<Node> viewOptional = fxWeaver.load(MovieEditReviewController.class).getView();
-        if(viewOptional.isPresent()) {
-            Node newContent = viewOptional.get();
-            detailPane.getChildren().setAll(newContent);
-        } else {
-            throw new ViewLoadException("Error Loading View From MovieEditReviewController Class!!");
-        }
-        // Creating Bindings For Navigation Buttons
-        btnEditedReviewPrevious.disableProperty().bind(currentReviewIndexProperty.isEqualTo(0));
-        btnEditedReviewNext.disableProperty().bind(currentReviewIndexProperty.lessThan(currentReviews.size()-1).not());
-        labelEditedReviewIndex.textProperty().bind(Bindings.convert(currentReviewIndexProperty.add(1)));
-        // Setting Current Index To 0
-        this.currentReviewIndexProperty.setValue(0);
-        // Set Fields To Values From Review At Index 0
-        refreshDisplayedEditedReview();
-    }
+//    @FXML
+//    public void onBtnEditReviewAction() {
+//        // Setting New Content To Display On detailsPane
+//        detailPane.getChildren().clear();
+//        Optional<Node> viewOptional = fxWeaver.load(MovieEditReviewController.class).getView();
+//        if(viewOptional.isPresent()) {
+//            Node newContent = viewOptional.get();
+//            detailPane.getChildren().setAll(newContent);
+//        } else {
+//            throw new ViewLoadException("Error Loading View From MovieEditReviewController Class!!");
+//        }
+//        // Creating Bindings For Navigation Buttons
+//        btnEditedReviewPrevious.disableProperty().bind(currentReviewIndexProperty.isEqualTo(0));
+//        btnEditedReviewNext.disableProperty().bind(currentReviewIndexProperty.lessThan(currentReviews.size()-1).not());
+//        labelEditedReviewIndex.textProperty().bind(Bindings.convert(currentReviewIndexProperty.add(1)));
+//        // Setting Current Index To 0
+//        this.currentReviewIndexProperty.setValue(0);
+//        // Set Fields To Values From Review At Index 0
+//        refreshDisplayedEditedReview();
+//    }
 
-    @FXML
-    public void onBtnEditedReviewPreviousAction() {
-        if(currentReviewIndexProperty.getValue() > 0) {
-            currentReviewIndexProperty.setValue(currentReviewIndexProperty.getValue()-1);
-            refreshDisplayedEditedReview();
-        }
-    }
+//    @FXML
+//    public void onBtnEditedReviewPreviousAction() {
+//        if(currentReviewIndexProperty.getValue() > 0) {
+//            currentReviewIndexProperty.setValue(currentReviewIndexProperty.getValue()-1);
+//            refreshDisplayedEditedReview();
+//        }
+//    }
 
-    @FXML
-    public void onBtnEditedReviewSaveAction() {
-        Review editedReview = currentReviews.stream().toList().get(currentReviewIndexProperty.getValue());
-        if(sliderEditedReviewRating.getValue() == 0 && areaEditedReviewBody.getText().equalsIgnoreCase("")) {
-            currentReviews.remove(editedReview);
-            if(editedReview.getReviewID() != 0) {
-                reviewService.deleteByReviewID(editedReview.getReviewID());
-            }
-        } else {
-            editedReview.setRating((int)(sliderEditedReviewRating.getValue()*10));
-            editedReview.setReview(areaEditedReviewBody.getText());
-            if(editedReview.getReviewID() != 0) {
-                reviewService.save(editedReview);
-            }
-        }
-    }
+//    @FXML
+//    public void onBtnEditedReviewSaveAction() {
+//        Review editedReview = currentReviews.stream().toList().get(currentReviewIndexProperty.getValue());
+//        if(sliderEditedReviewRating.getValue() == 0 && areaEditedReviewBody.getText().equalsIgnoreCase("")) {
+//            currentReviews.remove(editedReview);
+//            if(editedReview.getReviewID() != 0) {
+//                reviewService.deleteByReviewID(editedReview.getReviewID());
+//            }
+//        } else {
+//            editedReview.setRating((int)(sliderEditedReviewRating.getValue()*10));
+//            editedReview.setReview(areaEditedReviewBody.getText());
+//            if(editedReview.getReviewID() != 0) {
+//                reviewService.save(editedReview);
+//            }
+//        }
+//    }
 
-    @FXML
-    public void onBtnEditedReviewNextAction() {
-        if(currentReviewIndexProperty.getValue() < currentReviews.size()) {
-            currentReviewIndexProperty.setValue(currentReviewIndexProperty.getValue() + 1);
-            refreshDisplayedEditedReview();
-        }
-    }
+//    @FXML
+//    public void onBtnEditedReviewNextAction() {
+//        if(currentReviewIndexProperty.getValue() < currentReviews.size()) {
+//            currentReviewIndexProperty.setValue(currentReviewIndexProperty.getValue() + 1);
+//            refreshDisplayedEditedReview();
+//        }
+//    }
 
-    private void refreshDisplayedEditedReview() {
-        // Set Fields To Values From Review At Current Index
-        if(currentReviews.size() > 0) {
-            Review review = currentReviews.stream().toList().get(currentReviewIndexProperty.getValue());
-            sliderEditedReviewRating.setValue(review.getRating() / 10.0);
-            areaEditedReviewBody.setText(review.getReview());
-            ZonedDateTime currentReviewDate = review.getCreationData();
-            String currentDate = currentReviewDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            labelEditedReviewCreation.setText(currentDate);
-        }
-    }
+//    private void refreshDisplayedEditedReview() {
+//        // Set Fields To Values From Review At Current Index
+//        if(currentReviews.size() > 0) {
+//            Review review = currentReviews.stream().toList().get(currentReviewIndexProperty.getValue());
+//            sliderEditedReviewRating.setValue(review.getRating() / 10.0);
+//            areaEditedReviewBody.setText(review.getReview());
+//            ZonedDateTime currentReviewDate = review.getCreationData();
+//            String currentDate = currentReviewDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+//            labelEditedReviewCreation.setText(currentDate);
+//        }
+//    }
 
     /**
      * @author Grzegorz Lach
@@ -729,56 +726,29 @@ public class MovieController {
      * @return Set Of Director Objects Representing Currently Added Directors
      */
     private Set<Director> obtainCurrentDirectors() {
-//        // Returned Set
-//        HashSet<Director> obtainedSet = new HashSet<>();
-//        // Parsing Labels To Directors
-//        ObservableList<Node> elements = hDirectors.getChildren();
-//        for(Node e : elements) {
-//            if(e instanceof Label) {
-//                String content = ((Label) e).getText().trim();
-//                if(!content.equalsIgnoreCase(",")) {
-//                    // Verify If Director Already Exists In Database
-//                    if (directorService.existsByNameIgnoreCase(content)) {
-//                        Director fetchedDirector = directorService.getDirectorByNameEqualsIgnoreCase(content);
-//                        obtainedSet.add(fetchedDirector);
-//                    } else {
-//                        Director createdDirector = new Director(content);
-//                        obtainedSet.add(createdDirector);
-//                    }
-//                }
-//            }
-//        }
-//        return obtainedSet;
-        return currentMovie.getDirectors();
+        Set<Director> returnSet;
+        if(tableAddedDirectors.getItems().size() > 0) {
+            returnSet = tableAddedDirectors.getItems().stream().collect(Collectors.toSet());
+        } else {
+            returnSet = new HashSet<>();
+        }
+        return returnSet;
     }
 
     private Set<Writer> obtainCurrentWriters() {
-        // Returned Set
-        HashSet<Writer> obtainedSet = new HashSet<>();
-        // Parsing Labels To Directors
-        ObservableList<Node> elements = hWriters.getChildren();
-        for(Node e : elements) {
-            if(e instanceof Label label) {
-                String content = label.getText().trim();
-                if(!content.equalsIgnoreCase(",")) {
-                    // Verify If Writer Exists In Database
-                    if(writerService.existsByNameIgnoreCase(content)) {
-                        Writer fetchedWriter = writerService.getWriterByNameEqualsIgnoreCase(content);
-                        obtainedSet.add(fetchedWriter);
-                    } else {
-                        Writer createdWriter = new Writer(content);
-                        obtainedSet.add(createdWriter);
-                    }
-                }
-            }
+        Set<Writer> returnSet;
+        if(tableAddedWriters.getItems().size() > 0) {
+            returnSet = tableAddedWriters.getItems().stream().collect(Collectors.toSet());
+        } else {
+            returnSet = new HashSet<>();
         }
-        return obtainedSet;
+        return returnSet;
     }
 
-    private Set<Review> obtainCurrentReviews() {
-        //TODO: Add Logic For Obtaining Current Reviews For Selected Movie
-        return currentReviews;
-    }
+//    private Set<Review> obtainCurrentReviews() {
+//        //TODO: Add Logic For Obtaining Current Reviews For Selected Movie
+//        return currentReviews;
+//    }
 
     private void clearTextFields() {
         textRuntime.clear();
