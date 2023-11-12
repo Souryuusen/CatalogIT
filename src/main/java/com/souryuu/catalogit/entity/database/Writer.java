@@ -31,6 +31,7 @@ public class Writer {
         this.name = ScraperUtility.formatToCamelCase(name.trim());
     }
 
+    @Getter @Setter
     @ManyToMany(mappedBy = "writers")
     private Set<Movie> writtenMovies;
 

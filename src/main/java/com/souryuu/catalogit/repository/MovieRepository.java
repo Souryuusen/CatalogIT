@@ -10,6 +10,7 @@ import java.util.List;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     Movie getMovieByImdbUrlEqualsIgnoreCase(String imdbUrl);
+    Movie getMovieByTitleEqualsIgnoreCase(String movieTitle);
 
     Movie getMovieByMovieID(long id);
 

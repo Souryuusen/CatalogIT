@@ -1,8 +1,10 @@
 package com.souryuu.catalogit.service;
 
 import com.souryuu.catalogit.entity.database.Director;
+import com.souryuu.catalogit.entity.database.Movie;
 import com.souryuu.catalogit.entity.database.Writer;
 import com.souryuu.catalogit.repository.WriterRepository;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,5 +38,10 @@ public class WriterService {
         return this.repository.existsByNameIgnoreCase(name);
     }
 
+    public List<Writer> findWritersOfMovie(Movie movie) {
+        List<Writer> retrievedList = repository.findWriterByWrittenMoviesContains(movie);
+        retrievedList.stream().forEach(w -> Hibernate.initialize(w.getWrittenMovies()));
+        return retrievedList;
+    }
 
 }

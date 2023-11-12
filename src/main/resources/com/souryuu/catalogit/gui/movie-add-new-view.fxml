@@ -164,6 +164,7 @@
                            <Insets top="5.0" />
                         </VBox.margin>
                      </Button>
+                     <Button fx:id="btnSearchDatabase" mnemonicParsing="false" onAction="#onBtnSearchDatabaseAction" prefHeight="30.0" prefWidth="300.0" text="Znajdź W Bazie Danych" />
                      <Button fx:id="btnLoadData" mnemonicParsing="false" onAction="#onBtnLoadDataAction" prefHeight="30.0" prefWidth="300.0" text="Wczytaj Dane Z Pliku Tekstowego" />
                      <Button fx:id="btnSaveData" mnemonicParsing="false" onAction="#onBtnSaveDataAction" prefHeight="30.0" prefWidth="300.0" text="Zapisz Film Do Bazy Danych" />
                   </children>

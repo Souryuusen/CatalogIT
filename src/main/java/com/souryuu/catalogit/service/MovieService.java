@@ -98,6 +98,16 @@ public class MovieService {
         return movie;
     }
 
+    public Movie getMovieByTitleWithInitialization(String title) {
+        Movie movie = this.repository.getMovieByTitleEqualsIgnoreCase(title);
+        Hibernate.initialize(movie.getDirectors());
+        Hibernate.initialize(movie.getWriters());
+        Hibernate.initialize(movie.getReviews());
+        Hibernate.initialize(movie.getGenres());
+        Hibernate.initialize(movie.getTags());
+        return movie;
+    }
+
     public Set<Movie> getAllMovies() {
         return this.repository.findAll().stream().collect(Collectors.toSet());
     }

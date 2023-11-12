@@ -12,8 +12,6 @@ import com.souryuu.catalogit.utility.ScraperUtility;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -48,20 +46,15 @@ public class MovieController {
 
     private Movie currentMovie;
     private final HashSet<Review> currentReviews = new HashSet<>();
-    private final IntegerProperty currentReviewIndexProperty = new SimpleIntegerProperty(0);
-
     private Thread loadingThread;
 
     //##################################################################################################################
     @FXML AnchorPane root;
-    @FXML AnchorPane detailPane;
     @FXML AnchorPane editDirectorRoot;
     @FXML AnchorPane editWriterRoot;
     @FXML AnchorPane addReviewRoot;
     @FXML AnchorPane editReviewRoot;
 
-    @FXML HBox hDirectors;
-    @FXML HBox hWriters;
     @FXML HBox hAddNewDirector;
     @FXML HBox hRemoveDirector;
 
@@ -84,14 +77,11 @@ public class MovieController {
     @FXML Button btnScrapeData;
     @FXML Button btnLoadData;
     @FXML Button btnSaveData;
-    @FXML Button btnAddNewReview;
     @FXML Button btnAddNewDirector;
     @FXML Button btnRemoveDirector;
     @FXML Button btnAddNewWriter;
     @FXML Button btnRemoveWriter;
-    @FXML Button btnEditedReviewPrevious;
-    @FXML Button btnEditedReviewSave;
-    @FXML Button btnEditedReviewNext;
+    @FXML Button btnSearchDatabase;
 
     @FXML ComboBox<String> comboRemoveDirector;
     @FXML ComboBox<String> comboRemoveWriter;
@@ -101,13 +91,9 @@ public class MovieController {
 
     @FXML ImageView viewCoverImage;
 
-    @FXML TableView<Director> tableDirectors;
-    @FXML TableView<Writer> tableWriters;
     @FXML TableView<Director> tableAddedDirectors;
     @FXML TableView<Writer> tableAddedWriters;
 
-    @FXML TableColumn<Director, Long> columnDirectorsID;
-    @FXML TableColumn<Writer, Long> columnWritersID;
     @FXML TableColumn<Director, Long> columnAddedDirectorsID;
     @FXML TableColumn<Director, String> columnAddedDirectorsName;
     @FXML TableColumn<Writer, Long> columnAddedWritersID;
@@ -140,40 +126,67 @@ public class MovieController {
      */
     @FXML
     public void onBtnScrapeDataAction() {
-
         if(textImdbLink.getText().trim().length() > 0 && (loadingThread == null || !loadingThread.isAlive())) {
             String movieImdbLink = textImdbLink.getText().trim().toLowerCase();
             // Cleaning Of Tables
             tableAddedDirectors.getItems().clear();
             tableAddedWriters.getItems().clear();
             // Verification If Movie With This URL Exists In DB
-            currentMovie = movieService.getMovieByImdbUrl(movieImdbLink);
-            if(currentMovie != null && currentMovie.getImdbUrl().equalsIgnoreCase(movieImdbLink)) {
-                // Fetch All Fields From DB
-                currentMovie = movieService.getMovieByImdbUrlWithInitialization(currentMovie.getImdbUrl());
+            MovieData scrapedData = ScraperUtility.scrapeData(movieImdbLink);
+            currentMovie = new Movie(movieImdbLink, scrapedData);
+            currentReviews.clear();
+            scrapedData.getDirectors().ifPresent(this::addDirectors);
+            scrapedData.getWriters().ifPresent(this::addWriters);
+            // Display Movie Data
+            displayObtainedMovieInformation();
+        }
+    }
+
+    @FXML
+    public void onBtnSearchDatabaseAction() {
+        if(loadingThread == null || !loadingThread.isAlive()) {
+            if(textImdbLink.getText().trim().length() > 0) {
+                String movieImdbLink = textImdbLink.getText().trim().toLowerCase();
+                if(Movie.validateImdbLink(movieImdbLink)) {
+                    currentMovie = movieService.getMovieByImdbUrlWithInitialization(movieImdbLink);
+                } else {
+                    // TODO: Add error dialog for "Invalid IMDB URL"
+                }
+            } else if (textTitle.getText().trim().length() > 0) {
+                String movieTitle = textTitle.getText().trim().toLowerCase();
+                currentMovie = movieService.getMovieByTitleWithInitialization(movieTitle);
+            } else {
+                // TODO: Add error dialog for "Insufficient Data For Search Operation"
+            }
+            if(currentMovie != null) {
                 currentReviews.addAll(currentMovie.getReviews());
                 addDirectors(currentMovie.getDirectors().stream().map(Director::getName).toList());
                 addWriters(currentMovie.getWriters().stream().map(Writer::getName).toList());
+                // Display Movie Data
+                displayObtainedMovieInformation();
             } else {
-                MovieData scrapedData = ScraperUtility.scrapeData(movieImdbLink);
-                currentMovie = new Movie(movieImdbLink, scrapedData);
-                currentReviews.clear();
-                scrapedData.getDirectors().ifPresent(this::addDirectors);
-                scrapedData.getWriters().ifPresent(this::addWriters);
+                //TODO: Add error dialog for "Error During Database Search Operation"
             }
-            textTitle.setText(currentMovie.getTitle());
-            textCoverUrl.setText(currentMovie.getCoverUrl());
-            textRuntime.setText(currentMovie.getRuntime());
-            textReleaseDate.setText(currentMovie.getReleaseDate());
-            textCountryOfOrigin.setText(currentMovie.getCountryOfOrigin());
-            textLanguage.setText(currentMovie.getLanguage());
-            FXUtility.changeImageViewContent(viewCoverImage, currentMovie.getCoverUrl(), true);
-            currentMovie.setWriters(obtainCurrentWriters());
-            currentMovie.setDirectors(obtainCurrentDirectors());
-            displayAddedMovieDirectors();
-            displayAddedMovieWriters();
+        } else {
+            //TODO: Add error dialog for "Unable To Start DB Search Operation"
         }
     }
+
+    private void displayObtainedMovieInformation() {
+        // Display Movie Data
+        textTitle.setText(currentMovie.getTitle());
+        textCoverUrl.setText(currentMovie.getCoverUrl());
+        textRuntime.setText(currentMovie.getRuntime());
+        textReleaseDate.setText(currentMovie.getReleaseDate());
+        textCountryOfOrigin.setText(currentMovie.getCountryOfOrigin());
+        textLanguage.setText(currentMovie.getLanguage());
+        FXUtility.changeImageViewContent(viewCoverImage, currentMovie.getCoverUrl(), true);
+        currentMovie.setWriters(obtainCurrentWriters());
+        currentMovie.setDirectors(obtainCurrentDirectors());
+        displayAddedMovieDirectors();
+        displayAddedMovieWriters();
+    }
+
 
     /**
      * @author Grzegorz Lach
@@ -386,7 +399,8 @@ public class MovieController {
         comboRemoveDirector.setItems(FXCollections.observableList(currentDirectorNames).sorted());
         // Filling TableView With Database Entries
         tableAddedDirectors.getItems().clear();
-        tableAddedDirectors.setItems(FXCollections.observableList(directorService.findDirectorsOfMovie(currentMovie)));
+//        tableAddedDirectors.setItems(FXCollections.observableList(directorService.findDirectorsOfMovie(currentMovie)));
+        tableAddedDirectors.setItems(FXCollections.observableList(new ArrayList<>(currentMovie.getDirectors())));
         // Sorting Table By Director ID Field
         tableAddedDirectors.getSortOrder().add(columnAddedDirectorsID);
         tableAddedDirectors.sort();
@@ -402,7 +416,8 @@ public class MovieController {
         comboRemoveWriter.setItems(FXCollections.observableList(currentWritersNames).sorted());
         // Filling TableView With Database Entries
         tableAddedWriters.getItems().clear();
-        tableAddedWriters.setItems(FXCollections.observableList(writerService.findAll()));
+//        tableAddedWriters.setItems(FXCollections.observableList(writerService.findWritersOfMovie(currentMovie)));
+        tableAddedWriters.setItems(FXCollections.observableList(new ArrayList<>(currentMovie.getWriters())));
         // Sorting Table By Director ID Field
         tableAddedWriters.getSortOrder().add(columnAddedWritersID);
         tableAddedWriters.sort();
@@ -426,11 +441,11 @@ public class MovieController {
             // Clearing Text Fields...
             textNewDirectorName.setText("");
             // Refreshing TableView With Database Entries
-            tableDirectors.getItems().clear();
-            tableDirectors.setItems(FXCollections.observableList(directorService.findAll()));
+            tableAddedDirectors.getItems().clear();
+            tableAddedDirectors.setItems(FXCollections.observableList(directorService.findAll()));
             // Sorting Table By Director ID Field
-            tableDirectors.getSortOrder().add(columnDirectorsID);
-            tableDirectors.sort();
+            tableAddedDirectors.getSortOrder().add(columnAddedDirectorsID);
+            tableAddedDirectors.sort();
         }
     }
 
@@ -474,11 +489,11 @@ public class MovieController {
             // Clearing Text Fields...
             textNewWriterName.setText("");
             // Refreshing TableView With Database Entries
-            tableWriters.getItems().clear();
-            tableWriters.setItems(FXCollections.observableList(writerService.findAll()));
+            tableAddedWriters.getItems().clear();
+            tableAddedWriters.setItems(FXCollections.observableList(writerService.findAll()));
             // Sorting Table By Director ID Field
-            tableWriters.getSortOrder().add(columnWritersID);
-            tableWriters.sort();
+            tableAddedWriters.getSortOrder().add(columnAddedWritersID);
+            tableAddedWriters.sort();
         } else {
             DialogUtility.createErrorDialog("Nie można dodać wpisu!", "Brak danych scenarzysty!!");
         }
@@ -491,10 +506,12 @@ public class MovieController {
             // Parsing Current Directors List
             HashSet<Writer> currentWriters = (HashSet<Writer>)obtainCurrentWriters();
             // Remove Writer From TableView
-            if(tableAddedWriters.getItems().contains(writerToRemove)) {
-                tableAddedWriters.getItems().remove(writerToRemove);
+            boolean removed = false;
+            for(Writer w : currentWriters) {
+                if (w.getName().equalsIgnoreCase(writerToRemove.getName())) {
+                    removed = currentWriters.remove(w);
+                }
             }
-            boolean removed = currentWriters.remove(writerToRemove);
             if(removed) {
                 List<String> addedWritersNames = currentWriters.stream().map(Writer::getName).collect(Collectors.toList());
                 // Updating Directors
@@ -618,6 +635,17 @@ public class MovieController {
                         !(textImdbLink.textProperty().getValue().length() > toCheck.length());
             }
         }));
+        btnSearchDatabase.disableProperty().bind(Bindings.isEmpty(textImdbLink.textProperty()).or(new BooleanBinding() {
+            {
+                super.bind(textImdbLink.textProperty());
+            }
+            @Override
+            protected boolean computeValue() {
+                String toCheck = "https://www.imdb.com/title/";
+                return !textImdbLink.textProperty().getValue().toLowerCase().contains(toCheck) ||
+                        !(textImdbLink.textProperty().getValue().length() > toCheck.length());
+            }
+        }).and(Bindings.isEmpty(textTitle.textProperty())));
         // Setting Of Elements Bindings For Current Movie List
         btnAddNewDirector.disableProperty().bind(Bindings.isEmpty(textNewDirectorName.textProperty()));
         btnRemoveDirector.disableProperty().bind(Bindings.isNull(comboRemoveDirector.valueProperty()));
@@ -682,6 +710,8 @@ public class MovieController {
                 }
                 tableAddedDirectors.getItems().add(director);
             }
+        } else {
+            tableAddedDirectors.getItems().clear();
         }
     }
 
@@ -716,6 +746,8 @@ public class MovieController {
                 }
                 tableAddedWriters.getItems().add(writer);
             }
+        } else {
+            tableAddedWriters.getItems().clear();
         }
     }
 
