@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
 
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -34,6 +35,10 @@ public class Movie{
     private String releaseDate;
     @Column(name = "country_of_origin") @Getter @Setter
     private String countryOfOrigin;
+
+    @Getter @Setter
+    @Column(name = "creation_time")
+    private ZonedDateTime creationData;
 
     @Getter @Setter
     @ManyToMany(cascade = {CascadeType.MERGE})

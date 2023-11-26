@@ -1,19 +1,82 @@
-TextField{
-    -fx-background-color: white;
-    -fx-border-color: grey;
-    -fx-border-radius: 2;
-    -fx-border-width: 1;
+#root {
+    -fx-border-style: solid;
+    -fx-border-color: #616161;
+    -fx-border-radius: 5;
+    -fx-background-color: #424242;
+    -fx-border-width: 2px;
 }
+
+#paneCover {
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-color: #757575;
+    -fx-border-radius: 5;
+    -fx-border-width: 2px;
+}
+
+#labelHeader {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5;
+    -fx-border-color: #757575;
+}
+
+VBox HBox {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5;
+    -fx-border-color: #757575;
+}
+
+HBox AnchorPane {
+    -fx-background-color: #424242;
+}
+
+HBox AnchorPane HBox, #hSearchHeaderField {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #757575;
+}
+
+HBox AnchorPane AnchorPane {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #757575;
+}
+
 .table-view {
     -fx-alignment: CENTER;
     -fx-text-alignment: CENTER;
+    -fx-background-color: #616161;
+    -fx-background-radius: 5px;
     -fx-border-color: GRAY;
+    -fx-border-radius: 5px;
     -fx-border-width: 2px;
 }
 
 .table-row-cell:empty:odd, .table-row-cell:empty:even {
     -fx-background-color: transparent;
     -fx-border-style: none;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header {
+    -fx-background-color: #607D8B;
     -fx-border-color: transparent;
 }
 
@@ -42,5 +105,37 @@ TextField{
     -fx-border-style: none;
 }
 
-.button:hover {
+AnchorPane Label {
+    -fx-text-fill: WHITE;
+}
+
+TextField{
+    -fx-background-color: #CFD8DC;
+    -fx-background-radius: 5px;
+    -fx-border-style: solid;
+    -fx-border-color: #757575;
+    -fx-border-radius: 5px;
+    -fx-border-width: 1;
+}
+
+Button {
+    -fx-background-color: #607D8B;
+    -fx-background-radius: 5px;
+    -fx-border-radius: 5px;
+    -fx-text-fill: #CFD8DC;
+}
+
+Button:hover {
+    -fx-border-color: #CFD8DC;
+    -fx-background-color: #90A4AE;
+}
+
+HBox AnchorPane VBox {
+    -fx-text-fill: #E0E0E0;
+    -fx-background-color: #616161;
+    -fx-background-radius: 2px;
+    -fx-border-style: solid;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-border-color: #757575;
 }

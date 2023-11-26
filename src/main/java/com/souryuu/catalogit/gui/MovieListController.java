@@ -1,5 +1,7 @@
 package com.souryuu.catalogit.gui;
 
+import com.souryuu.catalogit.entity.DTO.MovieDTO;
+import com.souryuu.catalogit.entity.DTO.ReviewDTO;
 import com.souryuu.catalogit.entity.database.Director;
 import com.souryuu.catalogit.entity.database.Movie;
 import com.souryuu.catalogit.entity.database.Review;
@@ -61,6 +63,8 @@ public class MovieListController {
     @FXML AnchorPane root;
     @FXML AnchorPane paneDetails;
 
+    @FXML HBox hSearchHeaderField;
+
     @FXML Button btnShowMovieDetails;
     @FXML Button btnShowReviewDetails;
     @FXML Button btnSearch;
@@ -90,6 +94,7 @@ public class MovieListController {
     @FXML TableColumn<MovieDTO, String> columnMovieTitle;
     @FXML TableColumn<MovieDTO, Integer> columnMovieReviewAmount;
     @FXML TableColumn<MovieDTO, Number> columnMovieAverageRating;
+    @FXML TableColumn<MovieDTO, ZonedDateTime> columnMovieAddedDate;
     @FXML TableColumn<Director, Long> columnDirectorID;
     @FXML TableColumn<Director, String> columnDirectorName;
     @FXML TableColumn<Writer, Long> columnWriterID;
@@ -120,8 +125,8 @@ public class MovieListController {
 
     private void createBindings() {
         BooleanProperty currentMovieNullProperty = new SimpleBooleanProperty(currentMovie == null);
-        btnShowMovieDetails.disableProperty().bind(currentMovieNullProperty);
-        btnShowReviewDetails.disableProperty().bind(currentMovieNullProperty);
+        //btnShowMovieDetails.disableProperty().bind(currentMovieNullProperty);
+        //btnShowReviewDetails.disableProperty().bind(currentMovieNullProperty);
     }
 
     private void attachListeners() {
@@ -313,6 +318,21 @@ public class MovieListController {
                 }
             }
         });
+        columnMovieAddedDate.setCellValueFactory(new PropertyValueFactory<>("creationDate"));
+        columnMovieAddedDate.setCellFactory(tc -> new TableCell<MovieDTO, ZonedDateTime>() {
+            @Override
+            protected void updateItem(ZonedDateTime creationDate, boolean empty) {
+                if (empty) {
+                    setText("");
+                } else {
+                    if(creationDate != null) {
+                        setText(creationDate.format(DateTimeFormatter.ofPattern("HH:mm:ss dd.MM.yyyy")));
+                    } else {
+                        setText("-");
+                    }
+                }
+            }
+        });
         // Opening Movie Details After Double-Click
         tableMovies.setRowFactory(rf -> {
             TableRow<MovieDTO> row = new TableRow<>();
@@ -453,73 +473,7 @@ public class MovieListController {
         });
     }
 
-    @Data
-    public static class MovieDTO {
 
-        private DoubleProperty avgRating = new SimpleDoubleProperty(-1);
-        private int reviewsCount;
-        private long movieID;
-        private String averageRating;
-        private String title;
-        private String imdbUrl;
-        private String coverUrl;
-        private String runtime;
-        private String language;
-        private String releaseDate;
-        private String countryOfOrigin;
 
-        public MovieDTO(Movie m) {
-            if(m != null && m.getMovieID() != 0 && Hibernate.isInitialized(m.getReviews())) {
-                setMovieID(m.getMovieID());
-                setTitle(m.getTitle());
-                setImdbUrl(m.getImdbUrl());
-                setCoverUrl(m.getCoverUrl());
-                setRuntime(m.getRuntime());
-                setLanguage(m.getLanguage());
-                setReleaseDate(m.getReleaseDate());
-                setCountryOfOrigin(m.getCountryOfOrigin());
-                setReviewsCount(m.getReviews().size());
-                // Calculating Average Rating From Reviews
-                double avg = 0;
-                if (m.getReviews().size() > 0) {
-                    for (Review r : m.getReviews()) avg += r.getRating();
-                    avg /= m.getReviews().size();
-                    avg /= 10;
-                    avgRating.setValue(avg);
-                    setAverageRating(String.format("%.2f", avg));
-                } else {
-                    setAverageRating("-");
-                }
-            }
-        }
 
-        public DoubleProperty avgRatingProperty() {
-            return avgRating;
-        }
-
-        public final double getAvgRating() {
-            return avgRatingProperty().get();
-        }
-
-        public final void setAvgRating(double avgRating) {
-            avgRatingProperty().set(avgRating);
-        }
-    }
-
-    @Data
-    public static class ReviewDTO {
-
-        private double convertedRating;
-        private long reviewID;
-        private String formattedCreationDate;
-        private String reviewBody;
-
-        public ReviewDTO(Review review) {
-            setReviewID(review.getReviewID());
-            setConvertedRating(review.getRating()/10.0);
-            setFormattedCreationDate(review.getCreationData().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")));
-            setReviewBody(review.getReview());
-        }
-
-    }
 }
